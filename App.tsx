@@ -1,13 +1,16 @@
+
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Internships from './pages/Internships';
 import Verification from './pages/Verification';
 import Contact from './pages/Contact';
-import Quiz from './pages/Quiz';
+import QuizRegistration from './pages/QuizRegistration';
+import QuizResultPage from './pages/QuizResult';
 import Feedback from './pages/Feedback';
+import InterviewPrep from './pages/InterviewPrep';
 import ScrollToTop from './components/ScrollToTop';
 import RegistrationPopup from './components/RegistrationPopup';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -22,8 +25,12 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/internships" element={<Internships />} />
+            <Route path="/interview-prep" element={<InterviewPrep />} />
             <Route path="/verification" element={<Verification />} />
-            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/quiz/registration" element={<QuizRegistration />} />
+            <Route path="/quiz/result" element={<QuizResultPage />} />
+            {/* Redirect /quiz to /quiz/registration */}
+            <Route path="/quiz" element={<Navigate to="/quiz/registration" replace />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>

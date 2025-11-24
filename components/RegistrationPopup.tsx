@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { X, ArrowRight, Calendar } from 'lucide-react';
@@ -13,6 +12,9 @@ const RegistrationPopup: React.FC = () => {
   const idleThreshold = location.pathname === '/' ? 7000 : 20000;
 
   useEffect(() => {
+    // Disable popup logic on Interview Prep page
+    if (location.pathname === '/interview-prep') return;
+
     // If popup is already showing, don't track idle time
     if (isVisible) return;
 
@@ -49,6 +51,9 @@ const RegistrationPopup: React.FC = () => {
       // restarting the idle timer automatically.
     }, 300); 
   };
+
+  // Do not render on Interview Prep page
+  if (location.pathname === '/interview-prep') return null;
 
   if (!isVisible && !isClosing) return null;
 

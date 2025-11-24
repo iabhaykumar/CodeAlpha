@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { NAV_ITEMS } from '../constants';
-import { Menu, X, ArrowRight, Sun, Moon } from 'lucide-react';
+import { Menu, X, ArrowRight, Sun, Moon, ChevronDown } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark') || 
@@ -14,6 +15,7 @@ const Navbar: React.FC = () => {
     }
     return false;
   });
+  const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
   
   const location = useLocation();
 
@@ -41,7 +43,16 @@ const Navbar: React.FC = () => {
   // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
+    setOpenMobileSubmenu(null);
   }, [location]);
+
+  const handleMobileSubmenuToggle = (label: string) => {
+    if (openMobileSubmenu === label) {
+      setOpenMobileSubmenu(null);
+    } else {
+      setOpenMobileSubmenu(label);
+    }
+  };
 
   return (
     <>
@@ -57,28 +68,66 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="block group relative z-10 transition-transform duration-300 hover:scale-105">
             <div className={`relative flex items-center justify-center transition-all duration-300 ${!scrolled && !isOpen ? 'bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm px-3 py-1.5 rounded-xl shadow-sm border border-white/50 dark:border-slate-700' : ''}`}>
-              <img 
-                src="https://file-service.replit.com/f/89f38d95-2246-4832-9f20-b024a4d16416" 
-                alt="CodeAlpha" 
-                className={`object-contain transition-all duration-300 ${scrolled ? 'h-10' : 'h-12'}`} 
-              />
+              {!logoError ? (
+                <img 
+                  src="/logo-bg.png" 
+                  alt="CodeAlpha" 
+                  onError={() => setLogoError(true)}
+                  className={`object-contain transition-all duration-300 ${scrolled ? 'h-10' : 'h-12'}`} 
+                />
+              ) : (
+                <span className={`font-heading font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-kappel-500 dark:from-brand-400 dark:to-kappel-400 ${scrolled ? 'text-xl' : 'text-2xl'}`}>
+                  CodeAlpha
+                </span>
+              )}
             </div>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-slate-100 dark:border-slate-700 rounded-full shadow-sm px-3 py-2">
+          <nav className="hidden md:flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-slate-100 dark:border-slate-700 rounded-full shadow-sm px-2 py-1.5">
             {NAV_ITEMS.map((item) => (
-              <Link 
-                key={item.path} 
-                to={item.path}
-                className={`font-medium text-sm uppercase tracking-wide transition-all duration-300 relative px-4 py-1.5 rounded-full ${
-                  location.pathname === item.path 
-                    ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 font-bold shadow-inner' 
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-700/50'
-                }`}
-              >
-                {item.label}
-              </Link>
+              <div key={item.label} className="relative group">
+                {item.children ? (
+                  <button
+                    className={`font-medium text-sm uppercase tracking-wide transition-all duration-300 relative px-4 py-1.5 rounded-full flex items-center gap-1 text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-700/50 ${
+                        location.pathname.startsWith(item.path) ? 'text-brand-600 dark:text-brand-400 font-bold' : ''
+                    }`}
+                  >
+                    {item.label}
+                    <ChevronDown size={14} className="mt-0.5 group-hover:rotate-180 transition-transform duration-300" />
+                  </button>
+                ) : (
+                  <Link 
+                    to={item.path}
+                    className={`font-medium text-sm uppercase tracking-wide transition-all duration-300 relative px-4 py-1.5 rounded-full block ${
+                      location.pathname === item.path 
+                        ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 font-bold shadow-inner' 
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-700/50'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )}
+
+                {/* Dropdown Menu */}
+                {item.children && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 z-50">
+                        {item.children.map((child) => (
+                            <Link
+                                key={child.path}
+                                to={child.path}
+                                className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                                    location.pathname === child.path
+                                    ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-brand-600 dark:hover:text-brand-400'
+                                }`}
+                            >
+                                {child.label}
+                            </Link>
+                        ))}
+                    </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -124,17 +173,48 @@ const Navbar: React.FC = () => {
       <div className={`fixed inset-0 bg-white dark:bg-slate-950 z-50 md:hidden flex flex-col transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-6 pt-24 flex flex-col gap-2 overflow-y-auto">
             {NAV_ITEMS.map((item, idx) => (
-              <Link 
-                key={item.path} 
-                to={item.path}
-                style={{ animationDelay: `${idx * 70}ms` }}
-                className={`font-heading font-semibold text-2xl text-slate-800 dark:text-slate-200 p-4 rounded-lg hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between animate-in slide-in-from-right-8 fade-in fill-mode-backwards ${
-                    location.pathname === item.path ? 'bg-brand-50 dark:bg-slate-800 text-brand-600 dark:text-brand-400' : ''
-                }`}
-              >
-                {item.label}
-                <ArrowRight size={16} className="opacity-50" />
-              </Link>
+              <div key={item.label} style={{ animationDelay: `${idx * 70}ms` }} className="animate-in slide-in-from-right-8 fade-in fill-mode-backwards">
+                {item.children ? (
+                    <div className="flex flex-col">
+                        <button
+                            onClick={() => handleMobileSubmenuToggle(item.label)}
+                            className={`font-heading font-semibold text-2xl text-slate-800 dark:text-slate-200 p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between ${
+                                location.pathname.startsWith(item.path) ? 'text-brand-600 dark:text-brand-400' : ''
+                            }`}
+                        >
+                            {item.label}
+                            <ChevronDown size={20} className={`transition-transform duration-300 ${openMobileSubmenu === item.label ? 'rotate-180' : ''}`} />
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openMobileSubmenu === item.label ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className="flex flex-col pl-4 border-l-2 border-slate-100 dark:border-slate-800 ml-4 my-1 space-y-1">
+                                {item.children.map((child) => (
+                                    <Link
+                                        key={child.path}
+                                        to={child.path}
+                                        className={`font-sans font-medium text-lg py-2 px-4 rounded-lg transition-colors ${
+                                            location.pathname === child.path 
+                                            ? 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400' 
+                                            : 'text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-300'
+                                        }`}
+                                    >
+                                        {child.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <Link 
+                        to={item.path}
+                        className={`font-heading font-semibold text-2xl text-slate-800 dark:text-slate-200 p-4 rounded-lg hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-between ${
+                            location.pathname === item.path ? 'bg-brand-50 dark:bg-slate-800 text-brand-600 dark:text-brand-400' : ''
+                        }`}
+                    >
+                        {item.label}
+                        <ArrowRight size={16} className="opacity-50" />
+                    </Link>
+                )}
+              </div>
             ))}
             <div className="mt-auto pt-8 animate-in slide-in-from-bottom-8 delay-300 fade-in fill-mode-backwards">
               <a 

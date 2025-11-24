@@ -14,6 +14,7 @@ export interface NavItem {
   label: string;
   path: string;
   isExternal?: boolean;
+  children?: NavItem[];
 }
 
 export interface VerificationResult {

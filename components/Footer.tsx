@@ -1,8 +1,11 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Linkedin, Twitter, Youtube, MessageCircle, Phone, Mail, MapPin } from 'lucide-react';
 
 const Footer: React.FC = () => {
+  const [logoError, setLogoError] = useState(false);
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-24 pb-12 border-t border-slate-800">
       <div className="container mx-auto px-4">
@@ -11,7 +14,18 @@ const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 delay-0 fill-mode-backwards">
             <Link to="/" className="inline-block mb-6 bg-white px-4 py-3 rounded-xl shadow-lg hover:-translate-y-1 transition-transform duration-300 group">
-                <img src="https://file-service.replit.com/f/89f38d95-2246-4832-9f20-b024a4d16416" alt="CodeAlpha" className="h-12 w-auto group-hover:scale-105 transition-transform" />
+                {!logoError ? (
+                  <img 
+                    src="/logo-bg.png" 
+                    alt="CodeAlpha" 
+                    onError={() => setLogoError(true)}
+                    className="h-12 w-auto group-hover:scale-105 transition-transform" 
+                  />
+                ) : (
+                  <span className="font-heading font-bold text-2xl tracking-tight bg-gradient-to-r from-brand-600 to-kappel-600 bg-clip-text text-transparent">
+                    CodeAlpha
+                  </span>
+                )}
             </Link>
             <p className="mb-8 leading-relaxed text-slate-400 text-sm">
               CodeAlpha leads in Ed-Tech, shaping future tech creators through hands-on internships and real-world projects. Building the next generation of developers.
