@@ -44,3 +44,10 @@ export enum StatsType {
   SATISFACTION = 'Satisfaction',
   COUNTRIES = 'Countries'
 }
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  picture?: string;
+  id: string;
+}

@@ -1,82 +1,184 @@
-import React, { useState, useEffect } from 'react';
-import { GraduationCap } from 'lucide-react';
-
-// Data generated based on user request: 80% Indian, 20% International, 60/40 gender split
-const names = [
-  // User-provided list
-  "Dhanashree Tembhare", "Akshara Kumari", "VIJAY I", "Arti Mehra", "Sohil", "Kokate Pranali Santosh", "Anjali Verma", "Kasturi", "Raju", "Alavala Srinivasu",
-  // 500+ Generated Names
-  "Aaradhya Sharma", "Ananya Singh", "Isha Patel", "Diya Kumar", "Kavya Reddy", "Priya Gupta", "Riya Sharma", "Saanvi Mishra", "Myra Das", "Navya Jain", "Aisha Khan", "Zara Ali", "Ishita Gupta", "Siya Verma", "Aarohi Kumar", "Advika Sharma", "Alisha Singh", "Amrita Patel", "Anika Reddy", "Avani Gupta", "Bhavna Sharma", "Charvi Singh", "Devika Kumar", "Esha Das", "Gauri Mishra", "Ira Jain", "Jiya Khan", "Khushi Ali", "Kiara Gupta", "Larisa Verma", "Mahika Sharma", "Manasi Singh", "Mira Patel", "Nidhi Reddy", "Niharika Gupta", "Pari Sharma", "Pooja Singh", "Prisha Kumar", "Radha Das", "Samaira Mishra", "Sara Jain", "Shreya Khan", "Sonia Ali", "Suhana Gupta", "Tara Verma", "Vanya Sharma", "Vidya Singh", "Yamini Patel", "Aahana Reddy", "Aalia Gupta", "Aarvi Sharma", "Aashka Singh", "Adhira Kumar", "Agrima Das", "Amara Mishra", "Amulya Jain", "Anvi Khan", "Arya Ali", "Asmi Gupta", "Avni Verma", "Bhoomi Sharma", "Binal Singh", "Chaitali Patel", "Dakshata Reddy", "Damini Gupta", "Darshana Sharma", "Dhriti Singh", "Divya Kumar", "Ekta Das", "Elina Mishra", "Falguni Jain", "Gargi Khan", "Gitanjali Ali", "Hansa Gupta", "Harshita Verma", "Heena Sharma", "Himani Singh", "Indu Patel", "Ishani Reddy", "Jhanvi Gupta", "Juhi Sharma", "Jyoti Singh", "Kajal Kumar", "Kalyani Das", "Kanika Mishra", "Karishma Jain", "Kashvi Khan", "Kavita Ali", "Keya Gupta", "Komal Verma", "Kriti Sharma", "Kshama Singh", "Lavanya Patel", "Leela Reddy", "Madhu Gupta", "Mahi Sharma", "Malika Singh", "Mansi Kumar", "Mayuri Das", "Megha Mishra", "Meher Jain", "Minal Khan", "Mona Ali", "Monika Gupta", "Mridula Verma", "Mugdha Sharma", "Naina Singh", "Nalini Patel", "Namrata Reddy", "Nandini Gupta", "Neelam Sharma", "Neeti Singh", "Nikhita Kumar", "Nirali Das", "Nisha Mishra", "Nitya Jain", "Ojaswini Khan", "Pallavi Ali", "Pankaja Gupta", "Payal Verma", "Prajakta Sharma", "Pranali Singh", "Pratima Patel", "Preeti Reddy", "Priyanka Gupta", "Purva Sharma", "Rachana Singh", "Ragini Kumar", "Rajeshwari Das", "Rani Mishra", "Rashmi Jain", "Reva Khan", "Riddhi Ali", "Ritika Gupta", "Roshni Verma", "Rupali Sharma", "Sachi Singh", "Sadhana Patel", "Sagarika Reddy", "Saloni Gupta", "Samiksha Sharma", "Sandhya Singh", "Sangita Kumar", "Sanjana Das", "Sarika Mishra", "Seema Jain", "Shaila Khan", "Shalini Ali", "Shanti Gupta", "Sharmila Verma", "Shikha Sharma", "Shilpa Singh", "Shivani Patel", "Shraddha Reddy", "Shruti Gupta", "Shweta Sharma", "Smita Singh", "Smriti Kumar", "Sneha Das", "Sonal Mishra", "Sonam Jain", "Suchita Khan", "Sujata Ali", "Sumitra Gupta", "Sunita Verma", "Supriya Sharma", "Sushma Singh", "Swati Patel", "Tanvi Reddy", "Tejal Gupta", "Tisha Sharma", "Trisha Singh", "Uma Kumar", "Urmila Das", "Urvashi Mishra", "Vaishali Jain", "Vandana Khan", "Varsha Ali",
-  "Olivia Smith", "Emma Johnson", "Charlotte Williams", "Amelia Brown", "Sophia Jones", "Mia Garcia", "Isabella Miller", "Ava Davis", "Evelyn Rodriguez", "Luna Martinez", "Harper Hernandez", "Camila Lopez", "Gianna Gonzalez", "Abigail Wilson", "Sofia Anderson", "Ella Taylor", "Elizabeth Thomas", "Emily Moore", "Avery Jackson", "Mila Martin", "Scarlett Lee", "Eleanor Perez", "Madison Thompson", "Layla White", "Penelope Harris", "Aria Sanchez", "Chloe Clark", "Grace Lewis", "Ellie Robinson", "Nora Walker", "Hazel Young", "Zoey Allen", "Riley King", "Victoria Wright", "Lily Scott", "Aurora Torres", "Violet Nguyen", "Nova Hill", "Hannah Green", "Emilia Adams", "Zoe Baker", "Stella Nelson", "Everly Carter", "Isla Mitchell", "Leah Roberts", "Lillian Turner", "Addison Phillips", "Willow Campbell", "Lucy Parker", "Paisley Evans",
-  "Aarav Kumar", "Aditya Singh", "Arjun Patel", "Aryan Sharma", "Dhruv Gupta", "Ishaan Verma", "Kabir Khan", "Karan Reddy", "Rahul Das", "Rohan Mishra", "Aayush Singh", "Advik Sharma", "Akshay Gupta", "Amit Verma", "Ankit Khan", "Arnav Reddy", "Ayush Das", "Darshan Mishra", "Dev Jain", "Gaurav Ali", "Harsh Gupta", "Hrithik Verma", "Jay Sharma", "Kartik Singh", "Kunal Patel", "Manish Reddy", "Mayank Gupta", "Mohit Sharma", "Nikhil Singh", "Nishant Kumar", "Pranav Das", "Raj Mishra", "Rajat Jain", "Ranbir Khan", "Rishi Ali", "Rohit Gupta", "Ronit Verma", "Sachin Sharma", "Sahil Singh", "Samar Patel", "Sanket Reddy", "Shaurya Gupta", "Siddharth Sharma", "Sumit Singh", "Tanmay Kumar", "Varun Das", "Vedant Mishra", "Vihan Jain", "Vikram Khan", "Vihaan Ali", "Yash Gupta", "Abhay Verma", "Abhishek Sharma", "Ajay Singh", "Akhil Patel", "Alok Reddy", "Amol Gupta", "Anand Sharma", "Anirudh Singh", "Apurva Kumar", "Ashish Das", "Atul Mishra", "Bharat Jain", "Chetan Khan", "Chirag Ali", "Deepak Gupta", "Girish Verma", "Gopal Sharma", "Hemant Singh", "Hitesh Patel", "Indrajeet Reddy", "Jatin Gupta", "Jignesh Sharma", "Kamal Singh", "Kapil Kumar", "Kishore Das", "Lalit Mishra", "Manoj Jain", "Mitesh Khan", "Naveen Ali", "Neeraj Gupta", "Nitin Verma", "Pankaj Sharma", "Parag Singh", "Piyush Patel", "Pradeep Reddy", "Prakash Gupta", "Prasad Sharma", "Praveen Singh", "Prem Kumar", "Raghav Das", "Rajesh Mishra", "Rakesh Jain", "Ravi Khan", "Ritesh Ali", "Sameer Gupta", "Sandeep Verma", "Sanjay Sharma", "Saurabh Singh", "Shashank Patel", "Shishir Reddy", "Soham Gupta", "Subhash Sharma", "Sudhir Singh", "Sujay Kumar", "Sunil Das", "Suresh Mishra", "Tushar Jain", "Uday Khan", "Utkarsh Ali", "Vaibhav Gupta", "Vikas Verma", "Vinay Sharma", "Vineet Singh", "Vipul Patel", "Vishal Reddy", "Vivek Gupta", "Yogesh Sharma",
-  "Liam Taylor", "Noah Martinez", "Oliver Anderson", "James Thomas", "Elijah Jackson", "William White A", "Henry Harris", "Lucas Martin", "Benjamin Thompson", "Theodore Garcia", "Jack Moore", "Levi Robinson", "Alexander Clark", "Jackson Rodriguez", "Mateo Lewis", "Daniel Lee", "Michael Walker", "Mason Hall", "Sebastian Allen", "Ethan Young", "Logan Hernandez", "Owen King", "Samuel Wright", "Jacob Lopez", "Asher Hill", "Aiden Scott", "John Green", "Joseph Adams", "Wyatt Baker", "David Nelson", "Leo Carter", "Luke Mitchell", "Julian Perez", "Hudson Roberts", "Grayson Turner", "Matthew Phillips", "Ezra Campbell", "Gabriel Parker", "Carter Evans", "Isaac Edwards"
-];
-const courses = ["Web Development", "Data Science", "App Development", "Python", "Cyber Security", "Machine Learning", "Cloud Computing"];
-const locations = ["Mumbai", "Delhi", "Berlin", "New York", "Pune", "London", "Bangalore", "Kolkata", "Hyderabad", "Singapore", "Dubai", "Jaipur", "Toronto", "Sydney", "Paris"];
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import { X, ArrowRight, Calendar } from 'lucide-react';
 
 const EnrollmentNotification: React.FC = () => {
-  const [notification, setNotification] = useState<{ name: string; course: string; location: string } | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const location = useLocation();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 5 seconds for Home, 7 seconds for other pages (Idle threshold)
+  const idleThreshold = location.pathname === '/' ? 5000 : 7000;
+  
+  // 2.5 Minutes in milliseconds
+  const SNOOZE_DURATION = 2.5 * 60 * 1000; 
+
+  // Helper to check if we are allowed to show the popup
+  const shouldShowPopup = () => {
+    const status = localStorage.getItem('reg_popup_status');
+    
+    // 1. If user permanently dismissed or applied, never show again.
+    if (status === 'dismissed' || status === 'applied') {
+        return false;
+    }
+
+    // 2. If user clicked "Maybe Later", check if the snooze time has passed.
+    if (status === 'delayed') {
+        const nextShowTime = localStorage.getItem('reg_popup_next_show');
+        if (nextShowTime) {
+            const now = Date.now();
+            if (now < parseInt(nextShowTime, 10)) {
+                return false; // Still snoozed
+            }
+        }
+    }
+
+    return true;
+  };
 
   useEffect(() => {
-    const showRandomNotification = () => {
-      // Hide previous notification to reset animation
-      setIsVisible(false);
+    // Disable popup logic on Interview Prep page
+    if (location.pathname === '/interview-prep') return;
 
-      // After a short delay for the fade-out, show the new one
-      setTimeout(() => {
-        const randomName = names[Math.floor(Math.random() * names.length)];
-        const randomCourse = courses[Math.floor(Math.random() * courses.length)];
-        const randomLocation = locations[Math.floor(Math.random() * locations.length)];
-        
-        setNotification({ name: `${randomName.split(' ')[0]}`, course: randomCourse, location: randomLocation });
-        setIsVisible(true);
-      }, 500); // 0.5s fade out
+    // If popup is already showing, don't track idle time
+    if (isVisible) return;
+
+    // If previously dismissed/applied, don't run logic
+    if (!shouldShowPopup()) return;
+
+    const resetTimer = () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      
+      // Only schedule if allowed
+      if (shouldShowPopup()) {
+        timerRef.current = setTimeout(() => {
+            // Double check before showing
+            if (shouldShowPopup()) {
+                setIsVisible(true);
+                setIsClosing(false);
+            }
+        }, idleThreshold);
+      }
     };
 
-    // Initial delay before first notification
-    const initialTimeout = setTimeout(showRandomNotification, 2500);
-    // Interval for subsequent notifications
-    const interval = setInterval(showRandomNotification, 5500); // 1.5s interval between notifications appearing
+    // Events to detect user activity
+    const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart', 'click'];
+
+    // Set initial timer
+    resetTimer();
+
+    // Add event listeners
+    events.forEach(event => window.addEventListener(event, resetTimer));
 
     return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
     };
-  }, []);
+  }, [isVisible, idleThreshold, location.pathname]);
 
-  if (!notification) {
-    return null;
-  }
+  // 1. Handle Permanent Dismissal (X button or Backdrop)
+  const handleClose = () => {
+    localStorage.setItem('reg_popup_status', 'dismissed');
+    closePopupAnimation();
+  };
+
+  // 2. Handle Apply Now (Permanent Dismissal)
+  const handleApply = () => {
+    localStorage.setItem('reg_popup_status', 'applied');
+    closePopupAnimation();
+    // Allow default link behavior to proceed
+  };
+
+  // 3. Handle Maybe Later (Snooze for 2.5 minutes)
+  const handleMaybeLater = () => {
+    localStorage.setItem('reg_popup_status', 'delayed');
+    localStorage.setItem('reg_popup_next_show', (Date.now() + SNOOZE_DURATION).toString());
+    closePopupAnimation();
+  };
+
+  const closePopupAnimation = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300);
+  };
+
+  // Do not render on Interview Prep page
+  if (location.pathname === '/interview-prep') return null;
+
+  if (!isVisible && !isClosing) return null;
 
   return (
-    <div 
-      className={`fixed bottom-28 left-4 sm:left-8 z-50 w-[calc(100%-2rem)] max-w-sm transition-all duration-500 transform ${
-        isVisible 
-          ? 'translate-y-0 opacity-100' 
-          : 'translate-y-10 opacity-0'
-      }`}
-    >
-        <div className="relative rounded-2xl shadow-2xl overflow-hidden group">
-            <div className="absolute inset-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl"></div>
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none px-4 pb-4 sm:p-0 print:hidden">
+      {/* Backdrop */}
+      <div 
+        className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-500 pointer-events-auto ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+        onClick={handleClose}
+      ></div>
+
+      {/* Popup Card */}
+      <div 
+        className={`pointer-events-auto w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden relative transform transition-all duration-500 ${
+          isClosing 
+            ? 'translate-y-10 opacity-0 scale-95' 
+            : 'translate-y-0 opacity-100 scale-100 animate-in slide-in-from-bottom-8 fade-in zoom-in-95'
+        }`}
+      >
+        {/* Decorative Header */}
+        <div className="bg-gradient-to-r from-brand-600 to-kappel-500 relative overflow-hidden p-6 flex items-center">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             
-            <div className="relative flex items-center gap-4 p-4">
-                <div className="relative shrink-0 w-14 h-14 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-green-500 rounded-full opacity-20 animate-[ping_2s_ease-out_infinite]"></div>
-                    <div className="relative w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
-                        <GraduationCap size={24} />
-                    </div>
+            <div className="relative z-10 text-white w-full">
+                <div className="flex items-center justify-between mb-1">
+                    <span className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-white/10">Limited Seats</span>
+                    <button 
+                        onClick={handleClose}
+                        className="text-white/70 hover:text-white hover:bg-white/20 rounded-full p-1 transition-all"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+                <h3 className="text-2xl font-heading font-bold">Don't Miss Out!</h3>
+            </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+            <div className="flex gap-4 mb-6">
+                <div className="shrink-0 w-12 h-12 bg-brand-50 dark:bg-brand-900/30 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400">
+                    <Calendar size={24} />
                 </div>
                 <div>
-                    <p className="text-sm font-bold text-slate-800 dark:text-white">
-                    {notification.name} from {notification.location}
-                    </p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                    just enrolled in <span className="font-semibold text-brand-700 dark:text-brand-400">{notification.course}</span>
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        Join the waiting list for our next internship cohort. Start building your career with real-world projects today.
                     </p>
                 </div>
             </div>
+
+            <div className="flex gap-3">
+                <button 
+                    onClick={handleMaybeLater}
+                    className="flex-1 py-3 rounded-xl font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors text-sm"
+                >
+                    Maybe Later
+                </button>
+                <a 
+                    href="https://forms.gle/s9TW7Tqi3tAQLCu78" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    onClick={handleApply}
+                    className="flex-[1.5] bg-slate-900 hover:bg-brand-600 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-500/30 transition-all group relative overflow-hidden text-sm"
+                >
+                    <span className="relative z-10 flex items-center gap-2">Apply Now <ArrowRight size={16} /></span>
+                    <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                </a>
+            </div>
         </div>
+      </div>
     </div>
   );
 };

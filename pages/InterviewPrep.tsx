@@ -1,11 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, Code, ChevronDown, ChevronUp, 
   BrainCircuit, Terminal, Lock, CheckCircle2, 
   Star, PlayCircle, FileText, Users, Building2, X, CreditCard, QrCode, ShieldCheck, Download, GraduationCap,
-  LogOut, User, Smartphone, ArrowRight, Loader2, Mail, Globe
+  LogOut, User, Smartphone, ArrowRight, Loader2, Mail, Globe, HelpCircle, Minus, Plus, SmartphoneNfc, Bot, Sparkles, AlertCircle, Check
 } from 'lucide-react';
+import SEO from '../components/SEO';
+import AIAssistant from '../components/AIAssistant';
 
 // --- Course Data ---
 const MODULES = [
@@ -57,44 +59,146 @@ const MODULES = [
   }
 ];
 
-const PREVIEWS = [
-  { type: 'PDF', title: 'Google Interview Cheatsheet.pdf', color: 'bg-red-100 text-red-600' },
-  { type: 'Video', title: 'Graph Algorithms in 1 Shot', color: 'bg-blue-100 text-blue-600' },
-  { type: 'Doc', title: 'Top 50 HR Answers Script', color: 'bg-yellow-100 text-yellow-600' }
+const DSA_QA = [
+  {
+    id: 1,
+    question: "What is the difference between an Array and a Linked List?",
+    answer: "Arrays store elements in contiguous memory locations, offering O(1) access but costly O(n) insertions/deletions. Linked Lists store nodes with pointers to the next element, allowing O(1) insertions/deletions if the position is known, but O(n) access time."
+  },
+  {
+    id: 2,
+    question: "Explain the time complexity of Binary Search.",
+    answer: "Binary Search has a time complexity of O(log n). In each step, it divides the search interval in half. This is much faster than Linear Search (O(n)) but requires the array to be sorted beforehand."
+  },
+  {
+    id: 3,
+    question: "What is a Hash Map and how does it handle collisions?",
+    answer: "A Hash Map stores key-value pairs and uses a hashing function to compute an index into an array of buckets or slots. Collisions (when two keys hash to the same index) are typically handled using Chaining (linked lists) or Open Addressing (probing)."
+  },
+  {
+    id: 4,
+    question: "What is the difference between BFS and DFS?",
+    answer: "BFS (Breadth-First Search) explores neighbors level by level using a Queue. It is good for finding the shortest path in unweighted graphs. DFS (Depth-First Search) explores as deep as possible along each branch using a Stack (or recursion). It is often used for pathfinding, topological sorting, and cycle detection."
+  },
+  {
+    id: 5,
+    question: "What is Dynamic Programming (DP)?",
+    answer: "Dynamic Programming is an optimization technique used to solve problems by breaking them down into simpler subproblems and storing their solutions (memoization or tabulation) to avoid redundant computations. Examples include Fibonacci sequence, Knapsack problem, and Longest Common Subsequence."
+  }
 ];
 
 const InterviewPrep: React.FC = () => {
-  // Login State - Generic userId (can be phone or email)
-  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('dsa_user_id'));
-  const [userId, setUserId] = useState(() => localStorage.getItem('dsa_user_id') || '');
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigate = useNavigate();
+  // Unified Login State: Checks both local and global auth
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem('dsa_user_id') || !!localStorage.getItem('user_profile');
+  });
+  const [userId, setUserId] = useState(() => {
+      const globalUser = localStorage.getItem('user_profile');
+      if (globalUser) return JSON.parse(globalUser).name;
+      return localStorage.getItem('dsa_user_id') || '';
+  });
   
   // Purchase State
   const [isPurchased, setIsPurchased] = useState(false);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   // Track if user tried to purchase before logging in
   const [pendingPurchase, setPendingPurchase] = useState(false);
 
+  // QA Accordion State
+  const [activeQA, setActiveQA] = useState<number | null>(null);
+
+  // Progress State: Set of strings "moduleId-topicIndex"
+  const [completedTopics, setCompletedTopics] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+        const getInitialUser = () => {
+            const globalUser = localStorage.getItem('user_profile');
+            if (globalUser) {
+                try {
+                    return JSON.parse(globalUser).name;
+                } catch { return '' }
+            }
+            return localStorage.getItem('dsa_user_id') || '';
+        };
+        const initialUserId = getInitialUser();
+        const storageKey = `dsa_progress_${initialUserId || 'guest'}`;
+        const saved = localStorage.getItem(storageKey);
+        try {
+            return saved ? new Set(JSON.parse(saved)) : new Set();
+        } catch {
+            return new Set();
+        }
+    }
+    return new Set();
+  });
+
+  // Listen for global auth changes from Navbar
+  useEffect(() => {
+    const handleAuthChange = () => {
+        const globalUser = localStorage.getItem('user_profile');
+        if (globalUser) {
+            const user = JSON.parse(globalUser);
+            setIsLoggedIn(true);
+            setUserId(user.name);
+            // Reload progress for this user
+            const storageKey = `dsa_progress_${user.name}`;
+            const saved = localStorage.getItem(storageKey);
+            setCompletedTopics(saved ? new Set(JSON.parse(saved)) : new Set());
+        } else {
+            // Only logout if no local ID exists either
+            if (!localStorage.getItem('dsa_user_id')) {
+                setIsLoggedIn(false);
+                setUserId('');
+                // Reset progress to guest
+                const saved = localStorage.getItem('dsa_progress_guest');
+                setCompletedTopics(saved ? new Set(JSON.parse(saved)) : new Set());
+            }
+        }
+    };
+    window.addEventListener('auth-change', handleAuthChange);
+    return () => window.removeEventListener('auth-change', handleAuthChange);
+  }, []);
+
+  // Save progress when it changes
+  useEffect(() => {
+      const storageKey = `dsa_progress_${userId || 'guest'}`;
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(completedTopics)));
+  }, [completedTopics, userId]);
+
   // Check purchase status on load based on logged in user
   useEffect(() => {
     if (isLoggedIn && userId) {
-        const purchaseStatus = localStorage.getItem(`dsa_purchased_${userId}`);
-        setIsPurchased(purchaseStatus === 'true');
+        // Simple mock check: If logged in globally, we can assume "free preview" or check purchase
+        const purchaseStatus = localStorage.getItem(`dsa_purchased_${userId}`) || localStorage.getItem('user_profile'); // Global users unlock for demo
+        setIsPurchased(!!purchaseStatus);
     } else {
         setIsPurchased(false);
     }
   }, [isLoggedIn, userId]);
+
+  // If user just logged in and had a pending purchase, open checkout
+  useEffect(() => {
+    if (isLoggedIn && pendingPurchase) {
+        setShowCheckout(true);
+        setPendingPurchase(false);
+    }
+  }, [isLoggedIn, pendingPurchase]);
+
+  // Calculate Progress Logic
+  const totalTopics = MODULES.reduce((acc, mod) => acc + mod.topics.length, 0);
+  const completedCount = completedTopics.size;
+  const progressPercentage = totalTopics > 0 ? Math.round((completedCount / totalTopics) * 100) : 0;
 
   const handleUnlockClick = () => {
     if (isLoggedIn) {
         setShowCheckout(true);
     } else {
         setPendingPurchase(true);
-        setShowLoginModal(true);
+        // Trigger global login modal via custom event
+        window.dispatchEvent(new Event('open-auth-modal'));
     }
   };
 
@@ -107,25 +211,18 @@ const InterviewPrep: React.FC = () => {
     setExpandedModule(expandedModule === id ? null : id);
   };
 
-  const handleLoginSuccess = (id: string) => {
-    setIsLoggedIn(true);
-    setUserId(id);
-    localStorage.setItem('dsa_user_id', id);
-    setShowLoginModal(false);
-    
-    // Resume purchase flow if that was the intent
-    if (pendingPurchase) {
-        setShowCheckout(true);
-        setPendingPurchase(false);
-    }
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserId('');
-    setIsPurchased(false);
-    localStorage.removeItem('dsa_user_id');
-    setExpandedModule(null);
+  const toggleTopicCompletion = (moduleId: string, index: number) => {
+      if (!isPurchased) return;
+      const topicId = `${moduleId}-${index}`;
+      setCompletedTopics(prev => {
+          const newSet = new Set(prev);
+          if (newSet.has(topicId)) {
+              newSet.delete(topicId);
+          } else {
+              newSet.add(topicId);
+          }
+          return newSet;
+      });
   };
 
   const handlePurchaseSuccess = () => {
@@ -142,95 +239,91 @@ const InterviewPrep: React.FC = () => {
       window.scrollTo({ top: document.getElementById('course-content')?.offsetTop || 0, behavior: 'smooth' });
   };
 
-  // Determine icon based on login type
-  const isEmailLogin = userId.includes('@');
+  const toggleQA = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveQA(activeQA === id ? null : id);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20 relative overflow-hidden">
+      <SEO 
+        title="Interview Preparation" 
+        description="Master Data Structures & Algorithms (DSA) with CodeAlpha. Get access to HR interview questions, aptitude tests, and mock interviews to crack MNC jobs." 
+      />
+
+      <AIAssistant 
+        title="Tech Coach"
+        pageContext="You are a Tech Interview Coach. Explain the DSA & Placement course content (Arrays, Linked Lists, Graphs, etc.), the value of the MNC specific cheat sheet (Google, Meta), and the pricing (₹499). Offer basic advice on how to prepare for interviews."
+        suggestions={["What is covered in DSA?", "Is the bundle worth it?", "HR Interview tips", "How to buy?"]}
+      />
+
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
       
       <div className="container mx-auto px-4">
         
         {/* User Login Header */}
-        <div className="flex justify-end mb-8 animate-fade-up">
-            {isLoggedIn ? (
+        <div className="flex justify-end mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
+            {isLoggedIn && (
                 <div className="flex items-center gap-4 bg-white/80 backdrop-blur px-5 py-2.5 rounded-full shadow-sm border border-slate-200">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600">
-                            {isEmailLogin ? <Mail size={16} /> : <Smartphone size={16} />}
+                            <User size={16} />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] uppercase font-bold text-slate-400 leading-none">Logged In</span>
-                            <span className="text-sm font-bold text-slate-700 leading-none mt-1">{userId}</span>
+                            <span className="text-[10px] uppercase font-bold text-slate-400 leading-none">Welcome</span>
+                            <span className="text-sm font-bold text-slate-700 leading-none mt-1 max-w-[150px] truncate">{userId}</span>
                         </div>
                     </div>
-                    <div className="w-px h-6 bg-slate-200 mx-1"></div>
-                    <button 
-                        onClick={handleLogout} 
-                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all" 
-                        title="Logout"
-                    >
-                        <LogOut size={18} />
-                    </button>
                 </div>
-            ) : (
-                <button
-                    onClick={() => setShowLoginModal(true)}
-                    className="group flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-sm border border-slate-200 text-slate-700 font-bold text-sm hover:border-brand-300 hover:text-brand-600 transition-all hover:shadow-md"
-                >
-                    <div className="bg-slate-100 group-hover:bg-brand-50 p-1.5 rounded-full transition-colors">
-                        <User size={16} />
-                    </div>
-                    Login / Signup
-                </button>
             )}
         </div>
 
         {/* Hero / Sales Pitch */}
-        <div className="text-center mb-12 animate-fade-up" style={{ animationDelay: '100ms' }}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-bold uppercase tracking-wider mb-6 border border-amber-200">
-            <Star size={16} className="fill-amber-600 text-amber-600" />
+        <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-bold uppercase tracking-wider mb-6 border border-amber-200 animate-in zoom-in duration-500 delay-200">
+            <Star size={16} className="fill-amber-600 text-amber-600 animate-[spin_3s_linear_infinite]" />
             Premium Bundle
           </div>
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-slate-900 mb-6">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold text-slate-900 mb-6 drop-shadow-sm">
             Master DSA & <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-kappel-500">Crack Placements</span>
           </h1>
-          <p className="text-slate-600 text-lg max-w-3xl mx-auto mb-8">
+          <p className="text-slate-600 text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
             The ultimate all-in-one resource. Includes Data Structures, Algorithms, Aptitude, Company-Specific Questions (Google, Meta, Tesla), and HR/GD Preparation.
           </p>
           
           {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm font-semibold text-slate-500 mb-12">
-            <span className="flex items-center gap-2"><CheckCircle2 size={18} className="text-green-500" /> 500+ DSA Problems</span>
-            <span className="flex items-center gap-2"><CheckCircle2 size={18} className="text-green-500" /> Top 50 MNC Sets</span>
-            <span className="flex items-center gap-2"><CheckCircle2 size={18} className="text-green-500" /> Lifetime Access</span>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm font-semibold text-slate-500 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+            <span className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100"><CheckCircle2 size={18} className="text-green-500" /> 500+ DSA Problems</span>
+            <span className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100"><CheckCircle2 size={18} className="text-green-500" /> Top 50 MNC Sets</span>
+            <span className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100"><CheckCircle2 size={18} className="text-green-500" /> Lifetime Access</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-start animate-fade-up" style={{ animationDelay: '200ms' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
           
           {/* Left Column: Curriculum / Content */}
           <div id="course-content" className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 animate-in fade-in slide-in-from-left-4 duration-500">
               <h2 className="text-2xl font-bold text-slate-900">Course Curriculum</h2>
-              {!isPurchased && <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Locked Content</span>}
+              {!isPurchased && <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1"><Lock size={12} /> Locked Content</span>}
             </div>
 
             {MODULES.map((module, index) => (
               <div 
                 key={module.id} 
-                className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden relative ${
+                style={{ animationDelay: `${index * 100}ms` }}
+                className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden relative animate-in fade-in slide-in-from-bottom-6 fill-mode-backwards ${
                   isPurchased 
-                    ? 'border-slate-200 shadow-sm hover:border-brand-300 cursor-pointer' 
-                    : 'border-slate-100 opacity-90 cursor-pointer'
+                    ? 'border-slate-200 shadow-sm hover:border-brand-300 cursor-pointer hover:shadow-md' 
+                    : 'border-slate-100 opacity-90 cursor-pointer hover:border-slate-200'
                 }`}
                 onClick={() => toggleModule(module.id)}
               >
                 {/* Lock Overlay if not purchased */}
                 {!isPurchased && (
-                  <div className="absolute inset-0 bg-slate-50/60 backdrop-blur-[2px] z-10 flex items-center justify-center group/lock">
-                     <div className="bg-white p-3 rounded-full shadow-lg border border-slate-100 group-hover/lock:scale-110 transition-transform">
+                  <div className="absolute inset-0 bg-slate-50/60 backdrop-blur-[2px] z-10 flex items-center justify-center group/lock transition-opacity duration-300">
+                     <div className="bg-white p-3 rounded-full shadow-lg border border-slate-100 group-hover/lock:scale-110 transition-transform duration-300">
                         <Lock className="text-slate-400 group-hover/lock:text-brand-500 transition-colors" size={24} />
                      </div>
                   </div>
@@ -238,52 +331,135 @@ const InterviewPrep: React.FC = () => {
 
                 <div className="p-6 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:bg-brand-50 transition-colors">
                       {module.icon}
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900">{module.title}</h3>
+                      <h3 className="font-bold text-lg text-slate-900 group-hover:text-brand-600 transition-colors">{module.title}</h3>
                       <p className="text-sm text-slate-500">{module.desc}</p>
                     </div>
                   </div>
                   {isPurchased && (
-                    expandedModule === module.id ? <ChevronUp className="text-brand-500" /> : <ChevronDown className="text-slate-400" />
+                    <div className={`transition-transform duration-300 ${expandedModule === module.id ? 'rotate-180' : ''}`}>
+                         <ChevronDown className="text-slate-400" />
+                    </div>
                   )}
                 </div>
 
-                {/* Expanded Content (Only visible if purchased) */}
-                <div className={`bg-slate-50 border-t border-slate-100 transition-[max-height] duration-500 ease-in-out overflow-hidden ${
-                  isPurchased && expandedModule === module.id ? 'max-h-[500px]' : 'max-h-0'
+                {/* Expanded Content (Only visible if purchased) - Using Grid Transition */}
+                <div className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                  isPurchased && expandedModule === module.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
                 }`}>
-                   <div className="p-6 space-y-6">
-                      {module.topics.map((topic, i) => (
-                        <div key={i} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white hover:shadow-sm transition-all border border-transparent hover:border-slate-100">
-                           <div className="mt-1 w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 shrink-0">
-                              {topic.hasVideo ? <PlayCircle size={16} /> : <FileText size={16} />}
-                           </div>
-                           <div className="flex-1">
-                              <h4 className="font-bold text-sm text-slate-800 mb-1 flex items-center gap-2">
-                                {topic.title}
-                                {topic.hasVideo && <span className="text-[10px] bg-slate-200 text-slate-600 px-1.5 rounded">Video</span>}
-                              </h4>
-                              <p className="text-xs text-slate-500 leading-relaxed">{topic.content}</p>
-                           </div>
-                           {topic.hasVideo ? (
-                              <a 
-                                href={topic.videoUrl} 
-                                target="_blank" 
-                                rel="noreferrer"
-                                className="text-xs font-bold text-brand-600 border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 flex items-center gap-1"
+                   <div className="overflow-hidden bg-slate-50 border-t border-slate-100">
+                       <div className="p-6 space-y-4">
+                          {module.topics.map((topic, i) => {
+                            const topicId = `${module.id}-${i}`;
+                            const isCompleted = completedTopics.has(topicId);
+                            
+                            return (
+                            <div key={i} className={`flex items-start gap-4 p-3 rounded-xl transition-all border group/topic ${isCompleted ? 'bg-green-50/50 border-green-100' : 'bg-transparent border-transparent hover:bg-white hover:border-slate-100 hover:shadow-sm'}`}>
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); toggleTopicCompletion(module.id, i); }}
+                                disabled={!isPurchased}
+                                className={`mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all disabled:cursor-not-allowed disabled:opacity-50 ${isCompleted ? 'bg-green-500 border-green-500 text-white' : 'border-slate-400 bg-transparent hover:border-green-500'}`}
+                                title={isCompleted ? "Mark as Incomplete" : "Mark as Complete"}
                               >
-                                Watch <PlayCircle size={14} />
-                              </a>
-                           ) : (
-                              <button className="text-xs font-bold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50">
-                                Read
+                                {isCompleted && <Check size={14} strokeWidth={3} />}
                               </button>
-                           )}
-                        </div>
-                      ))}
+                              
+                              <div className="mt-1 w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 shrink-0 group-hover/topic:scale-110 transition-transform">
+                                  {topic.hasVideo ? <PlayCircle size={16} /> : <FileText size={16} />}
+                              </div>
+                              <div className="flex-1">
+                                  <h4 className={`font-bold text-sm mb-1 flex items-center gap-2 ${isCompleted ? 'text-green-800 line-through decoration-green-300' : 'text-slate-800'}`}>
+                                    {topic.title}
+                                    {topic.hasVideo && <span className="text-[10px] bg-slate-200 text-slate-600 px-1.5 rounded animate-pulse no-underline">Video</span>}
+                                  </h4>
+                                  <p className={`text-xs leading-relaxed ${isCompleted ? 'text-green-600/70' : 'text-slate-500'}`}>{topic.content}</p>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                {topic.hasVideo ? (
+                                    <a 
+                                      href={topic.videoUrl} 
+                                      target="_blank" 
+                                      rel="noreferrer"
+                                      className="text-xs font-bold text-brand-600 border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 flex items-center gap-1 transition-colors"
+                                    >
+                                      Watch <PlayCircle size={14} />
+                                    </a>
+                                ) : (
+                                    <div className="group relative">
+                                      <button disabled className="text-xs font-bold text-slate-300 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-not-allowed bg-slate-50">
+                                        Video <Lock size={12} />
+                                      </button>
+                                      {/* Tooltip */}
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-slate-800 text-white text-[10px] px-2 py-1 rounded shadow-lg whitespace-nowrap z-20 animate-in fade-in zoom-in-95 duration-200">
+                                        Coming Soon
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                                      </div>
+                                    </div>
+                                )}
+                              </div>
+                            </div>
+                          )})}
+
+                          {/* DSA Specific Q&A Section */}
+                          {module.id === 'dsa' && (
+                            <div className="mt-8 pt-6 border-t border-slate-200">
+                              <div className="flex items-center gap-2 mb-4 text-slate-800">
+                                <HelpCircle size={20} className="text-brand-500" />
+                                <h3 className="font-bold text-lg">Common Interview Questions</h3>
+                              </div>
+                              <div className="space-y-3">
+                                  {DSA_QA.map((qa) => {
+                                    const isOpen = activeQA === qa.id;
+                                    return (
+                                      <div 
+                                        key={qa.id} 
+                                        className={`bg-white border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-sm ${
+                                            isOpen ? 'border-brand-200 shadow-md' : 'border-slate-200'
+                                        }`}
+                                      >
+                                        <button 
+                                          onClick={(e) => toggleQA(qa.id, e)}
+                                          className={`w-full text-left p-4 flex items-center justify-between gap-4 group transition-colors duration-200 ${
+                                              isOpen ? 'bg-slate-50' : 'bg-white hover:bg-slate-50'
+                                          }`}
+                                        >
+                                            <span className={`font-semibold text-sm transition-colors ${
+                                                isOpen ? 'text-brand-600' : 'text-slate-800 group-hover:text-brand-600'
+                                            }`}>
+                                                {qa.question}
+                                            </span>
+                                            <span className={`transition-transform duration-300 transform shrink-0 ${
+                                              isOpen ? 'rotate-180 text-brand-500' : 'text-slate-400 group-hover:text-brand-400'
+                                            }`}>
+                                              <ChevronDown size={18} />
+                                            </span>
+                                        </button>
+                                        <div 
+                                            className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                                              isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                                            }`}
+                                        >
+                                            <div className="overflow-hidden">
+                                              <div className={`p-4 pt-0 text-sm text-slate-600 leading-relaxed bg-slate-50 transition-opacity duration-300 ${
+                                                  isOpen ? 'opacity-100' : 'opacity-0'
+                                              }`}>
+                                                <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-2">
+                                                  {qa.answer}
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </div>
+                          )}
+                       </div>
                    </div>
                 </div>
               </div>
@@ -291,13 +467,30 @@ const InterviewPrep: React.FC = () => {
           </div>
 
           {/* Right Column: Pricing & Preview */}
-          <div className="lg:col-span-1 sticky top-24 space-y-6">
+          <div className="lg:col-span-1 sticky top-24 space-y-6 animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
             
+            {/* AI Resume Scanner Card */}
+            <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 cursor-pointer" onClick={() => navigate('/interview-prep/resume-scanner')}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-8 -mt-8 group-hover:bg-white/20 transition-colors"></div>
+                <div className="relative z-10">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-4 border border-white/20">
+                        <Bot size={24} className="text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">AI Resume Scanner</h3>
+                    <p className="text-indigo-100 text-sm mb-4 leading-relaxed">
+                        Check your ATS score and get instant feedback for MNC roles (Google, Microsoft) using AI.
+                    </p>
+                    <button className="bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+                        Try It Free <ArrowRight size={16} />
+                    </button>
+                </div>
+            </div>
+
             {/* Pricing / Dashboard Card */}
-            <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden relative">
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden relative transition-shadow hover:shadow-2xl duration-300">
                {isPurchased ? (
                  <div className="p-6">
-                    <div className="bg-green-50 border border-green-100 rounded-xl p-4 flex items-center gap-3 mb-6">
+                    <div className="bg-green-50 border border-green-100 rounded-xl p-4 flex items-center gap-3 mb-6 animate-in zoom-in duration-300">
                         <div className="bg-green-100 p-2 rounded-full text-green-600">
                             <ShieldCheck size={20} />
                         </div>
@@ -308,41 +501,49 @@ const InterviewPrep: React.FC = () => {
                     </div>
 
                     <h3 className="font-bold text-slate-900 mb-2">Your Progress</h3>
-                    <div className="w-full bg-slate-100 h-3 rounded-full mb-1">
-                        <div className="w-[5%] h-full bg-brand-500 rounded-full"></div>
+                    <div className="w-full bg-slate-100 h-3 rounded-full mb-2 overflow-hidden">
+                        <div 
+                            className="h-full bg-brand-500 rounded-full transition-all duration-1000 ease-out flex items-center justify-end"
+                            style={{ width: `${Math.max(5, progressPercentage)}%` }}
+                        >
+                            {progressPercentage > 0 && <div className="h-full w-full bg-white/20 animate-[shimmer_2s_infinite]"></div>}
+                        </div>
                     </div>
-                    <p className="text-xs text-slate-500 text-right mb-6">5% Completed</p>
+                    <p className="text-xs text-slate-500 text-right mb-6 font-semibold">
+                        {progressPercentage}% Completed ({completedCount}/{totalTopics})
+                    </p>
 
                     <h4 className="font-bold text-sm text-slate-700 mb-3 uppercase tracking-wider">Quick Resources</h4>
                     <div className="space-y-2 mb-6">
-                        <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors border border-transparent hover:border-slate-100">
-                            <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><PlayCircle size={18} /></div>
+                        <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors border border-transparent hover:border-slate-100 group">
+                            <div className="bg-purple-100 p-2 rounded-lg text-purple-600 group-hover:scale-110 transition-transform"><PlayCircle size={18} /></div>
                             <span className="text-sm font-medium text-slate-700">Video Library</span>
                         </button>
-                        <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors border border-transparent hover:border-slate-100">
-                            <div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Code size={18} /></div>
+                        <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors border border-transparent hover:border-slate-100 group">
+                            <div className="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:scale-110 transition-transform"><Code size={18} /></div>
                             <span className="text-sm font-medium text-slate-700">Practice Problems</span>
                         </button>
-                        <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors border border-transparent hover:border-slate-100">
-                            <div className="bg-orange-100 p-2 rounded-lg text-orange-600"><Download size={18} /></div>
+                        <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-left transition-colors border border-transparent hover:border-slate-100 group">
+                            <div className="bg-orange-100 p-2 rounded-lg text-orange-600 group-hover:scale-110 transition-transform"><Download size={18} /></div>
                             <span className="text-sm font-medium text-slate-700">Download Notes</span>
                         </button>
                     </div>
 
                     <div className="border-t border-slate-100 pt-4">
-                         <div className="flex items-center gap-3 opacity-50">
-                            <div className="bg-slate-100 p-2 rounded-lg text-slate-400"><GraduationCap size={18} /></div>
+                         <div className={`flex items-center gap-3 ${progressPercentage === 100 ? 'opacity-100' : 'opacity-50'}`}>
+                            <div className={`p-2 rounded-lg ${progressPercentage === 100 ? 'bg-brand-100 text-brand-600' : 'bg-slate-100 text-slate-400'}`}><GraduationCap size={18} /></div>
                             <div>
-                                <p className="text-sm font-bold text-slate-500">Certificate</p>
-                                <p className="text-xs text-slate-400">Locked (Complete 100%)</p>
+                                <p className="text-sm font-bold text-slate-700">Certificate</p>
+                                <p className="text-xs text-slate-400">{progressPercentage === 100 ? 'Ready to Download' : 'Locked (Complete 100%)'}</p>
                             </div>
-                            <Lock size={14} className="ml-auto text-slate-400" />
+                            {progressPercentage < 100 && <Lock size={14} className="ml-auto text-slate-400" />}
+                            {progressPercentage === 100 && <Download size={14} className="ml-auto text-brand-500 animate-bounce" />}
                          </div>
                     </div>
                  </div>
                ) : (
                  <div className="p-8">
-                  <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                  <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl shadow-md animate-pulse">
                     80% OFF
                   </div>
                   <div className="mb-6">
@@ -364,500 +565,119 @@ const InterviewPrep: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-600">
                       <CheckCircle2 size={16} className="text-green-500 shrink-0" />
-                      <span>Real MNC Questions (Google, etc)</span>
+                      <span>Company Specific Crack Sheet</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-600">
                       <CheckCircle2 size={16} className="text-green-500 shrink-0" />
-                      <span>HR & GD Preparation Guide</span>
+                      <span>HR & GD Prep Guide</span>
                     </div>
                   </div>
 
                   <button 
                     onClick={handleUnlockClick}
-                    className="w-full bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-brand-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full bg-slate-900 hover:bg-brand-600 text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-brand-500/30 transition-all active:scale-95 group relative overflow-hidden"
                   >
-                    Unlock Full Access <Lock size={18} />
+                     <span className="relative z-10 flex items-center justify-center gap-2">
+                        Unlock Bundle Now <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                     </span>
+                     <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                   </button>
-                  <p className="text-center text-xs text-slate-400 mt-4">
-                    {isLoggedIn ? '100% Secure Payment • Instant Access' : 'Login required to purchase'}
-                  </p>
+                  
+                  <div className="text-center mt-4">
+                     <p className="text-xs text-slate-400 flex items-center justify-center gap-1">
+                        <ShieldCheck size={12} /> 100% Money Back Guarantee (7 Days)
+                     </p>
+                  </div>
                  </div>
                )}
             </div>
 
-            {/* Preview / Proof Section */}
-            {!isPurchased && (
-              <div className="bg-slate-100 rounded-3xl p-6 border border-slate-200">
-                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-800">Sneak Peek</h3>
-                    <button 
-                      onClick={() => setShowPreviewModal(true)}
-                      className="text-xs font-bold text-brand-600 hover:underline"
-                    >
-                      View All
-                    </button>
-                 </div>
-                 <div className="space-y-3">
-                    {PREVIEWS.map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 hover:shadow-md transition-all cursor-pointer" onClick={() => setShowPreviewModal(true)}>
-                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${item.color}`}>
-                            {item.type === 'PDF' && <FileText size={20} />}
-                            {item.type === 'Video' && <PlayCircle size={20} />}
-                            {item.type === 'Doc' && <BookOpen size={20} />}
-                         </div>
-                         <div className="overflow-hidden">
-                            <p className="text-sm font-bold text-slate-800 truncate">{item.title}</p>
-                            <p className="text-xs text-slate-500">{item.type} • Preview Available</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-            )}
           </div>
-
         </div>
-      </div>
 
-      {/* Login Modal */}
-      {showLoginModal && (
-          <LoginModal 
-            onClose={() => setShowLoginModal(false)} 
-            onSuccess={handleLoginSuccess}
-            message={pendingPurchase ? "Please login to complete your purchase." : undefined}
-          />
-      )}
-
-      {/* Preview Modal */}
-      {showPreviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-up" onClick={() => setShowPreviewModal(false)}></div>
-           <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[80vh] overflow-y-auto relative z-10 p-8 animate-fade-up">
-              <button onClick={() => setShowPreviewModal(false)} className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full hover:bg-slate-200">
-                 <X size={20} />
-              </button>
-              <h2 className="text-2xl font-bold mb-6">Material Preview</h2>
-              
-              <div className="space-y-8">
-                 <div>
-                    <h3 className="font-bold text-lg mb-3 text-brand-600">1. Google Interview Cheatsheet (Page 1/10)</h3>
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 font-mono text-sm text-slate-700">
-                       <p className="mb-2"><span className="text-purple-600">Topic:</span> Graph Traversal (BFS/DFS)</p>
-                       <p className="mb-2"><span className="text-blue-600">Question:</span> Given a grid, find the shortest path from S to E avoiding obstacles.</p>
-                       <p className="mb-4"><span className="text-green-600">Optimal Approach:</span> Use BFS because it guarantees shortest path in unweighted graphs.</p>
-                       <div className="bg-slate-900 text-slate-300 p-4 rounded-lg">
-                          <code>
-                             function bfs(grid, start, end) &#123;<br/>
-                             &nbsp;&nbsp;let queue = [start];<br/>
-                             &nbsp;&nbsp;let visited = new Set();<br/>
-                             &nbsp;&nbsp;// ... full code in premium bundle<br/>
-                             &#125;
-                          </code>
-                       </div>
+        {/* Checkout Modal (Mock) */}
+        {showCheckout && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowCheckout(false)}></div>
+                <div className="bg-white rounded-2xl w-full max-w-md z-10 overflow-hidden shadow-2xl animate-in zoom-in-95">
+                    <div className="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
+                         <div className="flex items-center gap-3">
+                             <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-sm"><CreditCard size={20} className="text-brand-600"/></div>
+                             <div>
+                                 <h3 className="font-bold text-slate-900">Secure Checkout</h3>
+                                 <p className="text-xs text-slate-500">Completing purchase for User: {userId}</p>
+                             </div>
+                         </div>
+                         <button onClick={() => setShowCheckout(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
                     </div>
-                 </div>
-              </div>
-           </div>
-        </div>
-      )}
+                    
+                    <div className="p-8">
+                         <div className="mb-8 text-center">
+                             <p className="text-slate-500 font-bold uppercase text-xs mb-2">Total Amount</p>
+                             <h2 className="text-5xl font-bold text-slate-900">₹499</h2>
+                         </div>
+                         
+                         <div className="space-y-3 mb-8">
+                             <button onClick={handlePurchaseSuccess} className="w-full border border-slate-200 hover:border-brand-500 hover:bg-brand-50 p-4 rounded-xl flex items-center justify-between group transition-all">
+                                 <div className="flex items-center gap-3">
+                                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><SmartphoneNfc size={20}/></div>
+                                     <div className="text-left">
+                                         <p className="font-bold text-slate-800 text-sm">UPI / QR Code</p>
+                                         <p className="text-xs text-slate-500">Google Pay, PhonePe, Paytm</p>
+                                     </div>
+                                 </div>
+                                 <div className="w-4 h-4 rounded-full border-2 border-slate-300 group-hover:border-brand-500"></div>
+                             </button>
 
-      {/* Checkout Modal */}
-      {showCheckout && (
-        <CheckoutModal onClose={() => setShowCheckout(false)} onSuccess={handlePurchaseSuccess} />
-      )}
+                             <button onClick={handlePurchaseSuccess} className="w-full border border-slate-200 hover:border-brand-500 hover:bg-brand-50 p-4 rounded-xl flex items-center justify-between group transition-all">
+                                 <div className="flex items-center gap-3">
+                                     <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><CreditCard size={20}/></div>
+                                     <div className="text-left">
+                                         <p className="font-bold text-slate-800 text-sm">Card Payment</p>
+                                         <p className="text-xs text-slate-500">Credit / Debit Card</p>
+                                     </div>
+                                 </div>
+                                 <div className="w-4 h-4 rounded-full border-2 border-slate-300 group-hover:border-brand-500"></div>
+                             </button>
+                         </div>
+                         
+                         <div className="text-center text-xs text-slate-400 flex items-center justify-center gap-1">
+                             <Lock size={10}/> Encrypted & Secure Payment
+                         </div>
+                    </div>
+                </div>
+            </div>
+        )}
 
-      {/* Success Modal */}
-      {showSuccessModal && (
-          <PurchaseSuccessModal onClose={closeSuccessModal} />
-      )}
+        {/* Success Modal */}
+        {showSuccessModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={closeSuccessModal}></div>
+                <div className="bg-white rounded-3xl w-full max-w-sm z-10 p-8 text-center shadow-2xl animate-in zoom-in relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-500 to-green-500"></div>
+                    
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 shadow-lg shadow-green-500/20 animate-[bounce_1s_infinite]">
+                        <CheckCircle2 size={40} />
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Payment Successful!</h3>
+                    <p className="text-slate-500 mb-8 leading-relaxed">
+                        You have successfully unlocked the <strong>Complete DSA & Placement Bundle</strong>. Happy Learning!
+                    </p>
+                    
+                    <button 
+                        onClick={closeSuccessModal}
+                        className="w-full bg-slate-900 hover:bg-brand-600 text-white py-3.5 rounded-xl font-bold shadow-xl hover:shadow-brand-500/30 transition-all active:scale-95"
+                    >
+                        Start Learning Now
+                    </button>
+                </div>
+            </div>
+        )}
+
+      </div>
     </div>
   );
 };
-
-const LoginModal: React.FC<{ onClose: () => void; onSuccess: (id: string) => void; message?: string }> = ({ onClose, onSuccess, message }) => {
-    const [step, setStep] = useState(1);
-    const [authMethod, setAuthMethod] = useState<'phone' | 'email'>('email');
-    const [identifier, setIdentifier] = useState('');
-    const [otp, setOtp] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleSendOtp = (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        
-        if (authMethod === 'email') {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(identifier)) {
-                setError("Please enter a valid email address");
-                return;
-            }
-        } else {
-            // Basic phone validation (at least 7 digits for international)
-            if (identifier.replace(/\D/g, '').length < 7) {
-                setError("Please enter a valid phone number");
-                return;
-            }
-        }
-
-        setLoading(true);
-        // Simulate OTP API
-        setTimeout(() => {
-            setLoading(false);
-            setStep(2);
-        }, 1000);
-    };
-
-    const handleVerifyOtp = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (otp.length !== 4) {
-            setError("Please enter a 4-digit OTP");
-            return;
-        }
-        setLoading(true);
-        // Simulate verification
-        setTimeout(() => {
-            setLoading(false);
-            onSuccess(identifier);
-        }, 1000);
-    };
-
-    const resetForm = () => {
-        setStep(1); 
-        setError('');
-        setOtp('');
-    };
-
-    return (
-     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300" onClick={onClose}></div>
-        
-        {/* Modal Card */}
-        <div className="bg-white rounded-[2.5rem] w-full max-w-md p-8 md:p-10 relative z-10 shadow-2xl animate-fade-up overflow-hidden">
-            
-            {/* Decorative Gradients */}
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-400 to-purple-500"></div>
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-50 rounded-full blur-3xl pointer-events-none"></div>
-
-            <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full transition-colors z-20"><X size={20} className="text-slate-400 hover:text-slate-600" /></button>
-
-            {/* Header Section with Icon Animation */}
-            <div className="text-center mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-brand-50 to-purple-50 rounded-2xl flex items-center justify-center text-brand-600 mx-auto mb-5 shadow-inner border border-white relative group">
-                    <div className="absolute inset-0 bg-white/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    {/* Icon Switching */}
-                    <div className="relative transition-all duration-300 transform">
-                        {authMethod === 'email' ? (
-                            <Mail size={32} className="text-brand-600" />
-                        ) : (
-                            <Smartphone size={32} className="text-purple-600" />
-                        )}
-                    </div>
-                </div>
-                <h2 className="text-3xl font-heading font-bold text-slate-900 mb-2">
-                    {step === 1 ? 'Welcome Back' : 'Verification'}
-                </h2>
-                <p className="text-slate-500 text-sm max-w-xs mx-auto leading-relaxed">
-                    {message ? message : (step === 1 ? 'Enter your details to access premium content' : `We sent a code to ${identifier}`)}
-                </p>
-            </div>
-
-            {step === 1 ? (
-                <div className="space-y-6">
-                    {/* Animated Tab Switcher */}
-                    <div className="relative bg-slate-100 p-1.5 rounded-2xl flex">
-                        {/* Sliding Background */}
-                        <div 
-                            className={`absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-6px)] bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.05)] transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] ${authMethod === 'email' ? 'translate-x-0' : 'translate-x-full'}`}
-                        ></div>
-                        
-                        <button 
-                            type="button"
-                            onClick={() => { setAuthMethod('email'); setIdentifier(''); setError(''); }}
-                            className={`relative z-10 flex-1 py-3 rounded-xl text-sm font-bold transition-colors duration-300 ${authMethod === 'email' ? 'text-brand-700' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            Email
-                        </button>
-                        <button 
-                            type="button"
-                            onClick={() => { setAuthMethod('phone'); setIdentifier(''); setError(''); }}
-                            className={`relative z-10 flex-1 py-3 rounded-xl text-sm font-bold transition-colors duration-300 ${authMethod === 'phone' ? 'text-purple-700' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            Phone
-                        </button>
-                    </div>
-
-                    <form onSubmit={handleSendOtp} className="space-y-5">
-                         {/* Input Field with Icon */}
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1 tracking-wider">
-                                {authMethod === 'email' ? 'Email Address' : 'Mobile Number'}
-                            </label>
-                            <div className="relative group/input">
-                                <div className="absolute left-4 top-3.5 text-slate-400 group-focus-within/input:text-brand-500 transition-colors">
-                                    {authMethod === 'email' ? <Mail size={20} /> : <Globe size={20} />}
-                                </div>
-                                <input 
-                                    autoFocus
-                                    type={authMethod === 'email' ? "email" : "tel"}
-                                    value={identifier}
-                                    onChange={(e) => setIdentifier(e.target.value)}
-                                    placeholder={authMethod === 'email' ? "john@example.com" : "+1 234 567 8900"}
-                                    className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-lg font-medium placeholder:font-normal"
-                                />
-                            </div>
-                        </div>
-                        {error && (
-                            <div className="flex items-center gap-2 text-red-500 text-xs font-bold ml-1 animate-fade-up">
-                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                {error}
-                            </div>
-                        )}
-                        
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-xl shadow-slate-900/20 hover:bg-brand-600 hover:shadow-brand-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 relative overflow-hidden group"
-                        >
-                             {/* Button Shimmer */}
-                             <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-                            
-                            {loading ? <Loader2 className="animate-spin" /> : <>Get One-Time Password <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" /></>}
-                        </button>
-                    </form>
-                </div>
-            ) : (
-                <div className="animate-fade-up">
-                    <form onSubmit={handleVerifyOtp} className="space-y-6">
-                         <div>
-                            <div className="flex justify-between items-end mb-2 ml-1">
-                                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Enter Code</label>
-                            </div>
-                            <input 
-                                autoFocus
-                                type="text" 
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                placeholder="----"
-                                className="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-center text-3xl font-bold tracking-[0.5em] text-slate-800 placeholder:text-slate-300"
-                            />
-                        </div>
-                        {error && (
-                             <div className="flex items-center gap-2 text-red-500 text-xs font-bold ml-1 animate-fade-up">
-                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                {error}
-                            </div>
-                        )}
-                        
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-green-600/20 hover:bg-green-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group relative overflow-hidden"
-                        >
-                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-                            {loading ? <Loader2 className="animate-spin" /> : <>Verify & Access <ShieldCheck size={18} /></>}
-                        </button>
-                        <button 
-                            type="button"
-                            onClick={resetForm}
-                            className="w-full py-2 text-slate-400 text-sm font-semibold hover:text-slate-600 transition-colors"
-                        >
-                            Start Over
-                        </button>
-                    </form>
-                </div>
-            )}
-        </div>
-     </div>
-    );
-};
-
-const PurchaseSuccessModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={onClose}></div>
-        <div className="bg-white rounded-3xl w-full max-w-md p-8 relative z-10 shadow-2xl animate-fade-up text-center overflow-hidden">
-             {/* Confetti Background */}
-             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-50">
-                <div className="absolute top-[-10%] left-[20%] w-3 h-3 bg-red-500 rounded-full animate-float"></div>
-                <div className="absolute top-[-5%] left-[50%] w-4 h-4 bg-yellow-500 rounded-full animate-float-delayed"></div>
-                <div className="absolute top-[10%] left-[80%] w-3 h-3 bg-blue-500 rounded-full animate-float"></div>
-             </div>
-
-             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
-                 <div className="absolute inset-0 bg-green-500 rounded-full opacity-20 animate-ping"></div>
-                 <CheckCircle2 size={48} className="text-green-600 relative z-10" />
-             </div>
-
-             <h2 className="text-3xl font-heading font-bold text-slate-900 mb-2">Order Successful!</h2>
-             <p className="text-slate-500 mb-8">
-                Welcome to the premium club. Your learning journey begins now.
-             </p>
-
-             <div className="bg-slate-50 rounded-xl p-4 mb-8 text-left border border-slate-100">
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-500">Transaction ID</span>
-                    <span className="font-mono font-bold text-slate-800">TXN_{Math.floor(Math.random() * 1000000)}</span>
-                </div>
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-500">Date</span>
-                    <span className="font-bold text-slate-800">{new Date().toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Amount Paid</span>
-                    <span className="font-bold text-brand-600">₹499.00</span>
-                </div>
-             </div>
-
-             <button 
-                onClick={onClose}
-                className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-xl hover:bg-brand-600 hover:shadow-brand-500/30 transition-all active:scale-95"
-             >
-                Start Learning Now
-             </button>
-        </div>
-    </div>
-);
-
-const CheckoutModal: React.FC<{ onClose: () => void; onSuccess: () => void }> = ({ onClose, onSuccess }) => {
-    const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi'>('card');
-    const [processing, setProcessing] = useState(false);
-
-    const handlePay = (e: React.FormEvent) => {
-        e.preventDefault();
-        setProcessing(true);
-        setTimeout(() => {
-            onSuccess();
-        }, 2000);
-    };
-
-    return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose}></div>
-            <div className="bg-white rounded-3xl w-full max-w-4xl overflow-hidden relative z-10 flex flex-col md:flex-row shadow-2xl animate-fade-up">
-                
-                {/* Order Summary Sidebar */}
-                <div className="md:w-1/3 bg-slate-50 p-8 border-r border-slate-200">
-                    <h3 className="font-bold text-slate-900 mb-6 text-lg">Order Summary</h3>
-                    
-                    <div className="flex items-start gap-4 mb-6">
-                        <div className="w-16 h-16 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600 shrink-0">
-                            <Terminal size={28} />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-sm text-slate-800 leading-tight mb-1">Complete DSA & Placement Bundle</h4>
-                            <p className="text-xs text-slate-500">Lifetime Access</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3 mb-8 border-t border-b border-slate-200 py-4">
-                        <div className="flex justify-between text-sm text-slate-600">
-                            <span>Base Price</span>
-                            <span>₹2499</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-green-600 font-medium">
-                            <span>Discount (80%)</span>
-                            <span>-₹2000</span>
-                        </div>
-                        <div className="flex justify-between text-base font-bold text-slate-900 pt-2">
-                            <span>Total</span>
-                            <span>₹499</span>
-                        </div>
-                    </div>
-
-                    <h4 className="font-bold text-xs uppercase text-slate-400 tracking-wider mb-3">What's Included</h4>
-                    <ul className="space-y-2 text-sm text-slate-600">
-                        <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> 500+ Practice Problems</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> Video Solutions</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> HR & Aptitude Guide</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-green-500" /> Verified Certificate</li>
-                    </ul>
-                </div>
-
-                {/* Payment Form */}
-                <div className="flex-1 p-8">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-slate-900">Secure Checkout</h2>
-                        <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={20} /></button>
-                    </div>
-
-                    {/* Payment Method Tabs */}
-                    <div className="flex gap-4 mb-6">
-                        <button 
-                            onClick={() => setPaymentMethod('card')}
-                            className={`flex-1 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-                                paymentMethod === 'card' 
-                                ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20' 
-                                : 'border-slate-200 hover:bg-slate-50 text-slate-600'
-                            }`}
-                        >
-                            <CreditCard size={18} /> Card Payment
-                        </button>
-                        <button 
-                             onClick={() => setPaymentMethod('upi')}
-                             className={`flex-1 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-                                paymentMethod === 'upi' 
-                                ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20' 
-                                : 'border-slate-200 hover:bg-slate-50 text-slate-600'
-                            }`}
-                        >
-                            <QrCode size={18} /> UPI / QR
-                        </button>
-                    </div>
-
-                    <form onSubmit={handlePay} className="space-y-4">
-                        {paymentMethod === 'card' ? (
-                            <>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Name on Card</label>
-                                    <input required type="text" placeholder="John Doe" className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Card Number</label>
-                                    <input required type="text" placeholder="0000 0000 0000 0000" className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none" />
-                                </div>
-                                <div className="flex gap-4">
-                                    <div className="flex-1">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Expiry</label>
-                                        <input required type="text" placeholder="MM/YY" className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">CVV</label>
-                                        <input required type="password" placeholder="123" className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none" />
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                                <QrCode size={120} className="mx-auto text-slate-800 mb-4 opacity-80" />
-                                <p className="font-bold text-slate-800 mb-1">Scan to Pay ₹499</p>
-                                <p className="text-xs text-slate-500">Supports GPay, PhonePe, Paytm</p>
-                            </div>
-                        )}
-
-                        <button 
-                            type="submit" 
-                            disabled={processing}
-                            className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-brand-700 hover:shadow-brand-500/30 transition-all flex items-center justify-center gap-2 mt-6"
-                        >
-                            {processing ? (
-                                <>Processing...</>
-                            ) : (
-                                <>Pay ₹499 Securely <Lock size={18} /></>
-                            )}
-                        </button>
-                    </form>
-                    
-                    <div className="mt-6 flex items-center justify-center gap-4 opacity-50 grayscale">
-                        {/* Mock Logos */}
-                        <div className="h-6 w-10 bg-slate-300 rounded"></div>
-                        <div className="h-6 w-10 bg-slate-300 rounded"></div>
-                        <div className="h-6 w-10 bg-slate-300 rounded"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 export default InterviewPrep;

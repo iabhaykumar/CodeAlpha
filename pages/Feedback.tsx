@@ -3,6 +3,8 @@ import { Star, Send, Quote, Heart, PlusCircle, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { TESTIMONIALS } from '../constants';
 import { FeedbackItem } from '../types';
+import AIAssistant from '../components/AIAssistant';
+import SEO from '../components/SEO';
 
 const Feedback: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -48,6 +50,17 @@ const Feedback: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20">
+      <SEO 
+        title="Student Feedback & Reviews" 
+        description="Read what students are saying about CodeAlpha internships and courses. Share your own experience."
+        keywords={['CodeAlpha Reviews', 'Student Feedback', 'Testimonials', 'Internship Reviews', 'EdTech Reviews']}
+      />
+      <AIAssistant 
+        title="Feedback Helper"
+        pageContext="You are a Feedback Assistant. Encourage users to share honest reviews about their CodeAlpha internship experience. Help them structure their testimonials if asked."
+        suggestions={["What should I write?", "Can I edit later?", "Is my name public?"]}
+      />
+
       {/* Header */}
       <div className="container mx-auto px-4 mb-16 text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
         <span className="text-brand-600 font-bold tracking-wider text-sm uppercase mb-2 block">Community Voices</span>
@@ -233,10 +246,7 @@ const FeedbackCard: React.FC<{ item: FeedbackItem, index: number }> = ({ item, i
       <span className="relative z-10">"{item.content}"</span>
     </p>
     
-    <div className="flex items-center gap-4 pt-6 border-t border-slate-50">
-      <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-white shadow-sm">
-        <img src={item.avatar} alt={item.name} className="w-full h-full object-cover" />
-      </div>
+    <div className="pt-6 border-t border-slate-50">
       <div>
         <h4 className="font-bold text-slate-900 text-sm group-hover:text-brand-600 transition-colors">{item.name}</h4>
         <p className="text-xs text-slate-400">{item.role}</p>

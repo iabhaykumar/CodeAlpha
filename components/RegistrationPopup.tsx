@@ -61,47 +61,46 @@ const RegistrationPopup: React.FC = () => {
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none px-4 pb-4 sm:p-0">
       {/* Backdrop */}
       <div 
-        className={`absolute inset-0 bg-slate-900/20 backdrop-blur-sm transition-opacity duration-500 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+        className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-500 pointer-events-auto ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         onClick={handleClose}
       ></div>
 
       {/* Popup Card */}
       <div 
-        className={`pointer-events-auto w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden relative transform transition-all duration-500 ${
+        className={`pointer-events-auto w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden relative transform transition-all duration-500 ${
           isClosing 
             ? 'translate-y-10 opacity-0 scale-95' 
             : 'translate-y-0 opacity-100 scale-100 animate-in slide-in-from-bottom-8 fade-in zoom-in-95'
         }`}
       >
         {/* Decorative Header */}
-        <div className="h-24 bg-gradient-to-r from-brand-600 to-kappel-500 relative overflow-hidden p-6 flex items-center">
+        <div className="bg-gradient-to-r from-brand-600 to-kappel-500 relative overflow-hidden p-6 flex items-center">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
             
-            <div className="relative z-10 text-white">
-                <div className="flex items-center gap-2 mb-1">
+            <div className="relative z-10 text-white w-full">
+                <div className="flex items-center justify-between mb-1">
                     <span className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-white/10">New Batch</span>
+                    <button 
+                        onClick={handleClose}
+                        className="text-white/70 hover:text-white hover:bg-white/20 rounded-full p-1 transition-all"
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
                 <h3 className="text-2xl font-heading font-bold">Registration Open!</h3>
             </div>
-
-            <button 
-                onClick={handleClose}
-                className="absolute top-4 right-4 text-white/70 hover:text-white hover:bg-white/20 rounded-full p-1 transition-all"
-            >
-                <X size={20} />
-            </button>
         </div>
 
         {/* Content */}
         <div className="p-6">
             <div className="flex gap-4 mb-6">
-                <div className="shrink-0 w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600">
+                <div className="shrink-0 w-12 h-12 bg-brand-50 dark:bg-brand-900/30 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400">
                     <Calendar size={24} />
                 </div>
                 <div>
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                        Applications are now open for our upcoming <span className="font-bold text-slate-900">Virtual Internship Program</span>. Secure your spot in top domains like AI, Web Dev, and Cyber Security.
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        Applications are now open for our upcoming <span className="font-bold text-slate-900 dark:text-white">Virtual Internship Program</span>. Secure your spot in top domains like AI, Web Dev, and Cyber Security.
                     </p>
                 </div>
             </div>
@@ -109,7 +108,7 @@ const RegistrationPopup: React.FC = () => {
             <div className="flex gap-3">
                 <button 
                     onClick={handleClose}
-                    className="flex-1 py-3 rounded-xl font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+                    className="flex-1 py-3 rounded-xl font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors text-sm"
                 >
                     Maybe Later
                 </button>
@@ -118,7 +117,7 @@ const RegistrationPopup: React.FC = () => {
                     target="_blank" 
                     rel="noreferrer"
                     onClick={handleClose}
-                    className="flex-[1.5] bg-slate-900 hover:bg-brand-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-500/30 transition-all group relative overflow-hidden"
+                    className="flex-[1.5] bg-slate-900 hover:bg-brand-600 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-500/30 transition-all group relative overflow-hidden text-sm"
                 >
                     <span className="relative z-10 flex items-center gap-2">Apply Now <ArrowRight size={16} /></span>
                     <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>

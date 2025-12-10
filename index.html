@@ -1,13 +1,40 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0284c7" />
+    
+    <!-- Primary Meta Tags -->
     <title>CodeAlpha | Elevate Your Career</title>
+    <meta name="title" content="CodeAlpha | Elevate Your Career" />
+    <meta name="description" content="The ultimate student ecosystem. Virtual internships, Online Compiler, Tutorials, and Interview Prep all in one place." />
+    <meta name="keywords" content="CodeAlpha, Internships, Coding, Online Compiler, Interview Prep, DSA, Web Development, EdTech" />
+    <meta name="author" content="CodeAlpha" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codealpha.tech/" />
+    <meta property="og:title" content="CodeAlpha | Elevate Your Career" />
+    <meta property="og:description" content="The ultimate student ecosystem. Virtual internships, Online Compiler, Tutorials, and Interview Prep all in one place." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" />
+    <meta property="og:site_name" content="CodeAlpha" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://codealpha.tech/" />
+    <meta property="twitter:title" content="CodeAlpha | Elevate Your Career" />
+    <meta property="twitter:description" content="The ultimate student ecosystem. Virtual internships, Online Compiler, Tutorials, and Interview Prep all in one place." />
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Updated Fonts: Outfit for Headings, Plus Jakarta Sans for Body, DM Sans for Nav -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PrismJS Theme (VS Code Dark style) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -15,29 +42,51 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Poppins', 'sans-serif'],
-              heading: ['League Spartan', 'sans-serif'],
+              sans: ['"Plus Jakarta Sans"', 'sans-serif'], // Modern, geometric body font
+              heading: ['"Outfit"', 'sans-serif'], // Premium heading font
+              serif: ['"Merriweather"', 'serif'],
+              nav: ['"DM Sans"', 'sans-serif'], // Clean nav font
+              mono: ['"JetBrains Mono"', 'monospace'], // Great for code blocks
             },
             colors: {
               brand: {
                 50: '#f0f9ff',
                 100: '#e0f2fe',
+                200: '#bae6fd',
+                300: '#7dd3fc',
                 400: '#38bdf8',
                 500: '#0ea5e9',
                 600: '#0284c7',
                 700: '#0369a1',
+                800: '#075985',
                 900: '#0c4a6e',
+                950: '#082f49',
               },
               accent: {
+                50: '#fff1f2',
                 100: '#ffe4e6',
+                200: '#fecdd3',
+                300: '#fda4af',
                 400: '#fb7185',
                 500: '#f43f5e',
                 600: '#e11d48',
+                700: '#be123c',
+                800: '#9f1239',
+                900: '#881337',
+                950: '#4c0519',
               },
               kappel: {
+                50: '#f0fdfa',
                 100: '#ccfbf1',
-                500: '#00b894',
-                600: '#00a884',
+                200: '#99f6e4',
+                300: '#5eead4',
+                400: '#2dd4bf',
+                500: '#14b8a6',
+                600: '#0d9488',
+                700: '#0f766e',
+                800: '#115e59',
+                900: '#134e4a',
+                950: '#042f2e',
               }
             },
             animation: {
@@ -45,7 +94,11 @@
               'float-delayed': 'float 6s ease-in-out 3s infinite',
               'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               'shimmer': 'shimmer 2s linear infinite',
-              'fade-up': 'fadeUp 0.5s ease-out forwards',
+              'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+              'zoom-in': 'zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'scroll': 'scroll 40s linear infinite',
+              'blob': 'blob 7s infinite',
             },
             keyframes: {
               float: {
@@ -59,64 +112,41 @@
               fadeUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' }
+              },
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' }
+              },
+              zoomIn: {
+                '0%': { opacity: '0', transform: 'scale(0.95)' },
+                '100%': { opacity: '1', transform: 'scale(1)' }
+              },
+              scroll: {
+                '0%': { transform: 'translateX(0)' },
+                '100%': { transform: 'translateX(-50%)' },
+              },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
               }
             }
           }
         }
       }
     </script>
-    <style>
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f8fafc;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-      }
-      .dark ::-webkit-scrollbar-track {
-        background: #0f172a;
-      }
-      .dark ::-webkit-scrollbar-thumb {
-        background: #334155;
-      }
-      body {
-        -webkit-font-smoothing: antialiased;
-      }
-      .bg-grid-slate-100 {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23f1f5f9'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
-      }
-      .dark .bg-grid-slate-100 {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%231e293b'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
-      }
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 0.5);
-      }
-      .dark .glass-panel {
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      /* 3D Perspective Classes */
-      .perspective-1000 {
-        perspective: 1000px;
-      }
-      .preserve-3d {
-        transform-style: preserve-3d;
-      }
-      .backface-hidden {
-        backface-visibility: hidden;
-      }
-      .rotate-y-12 {
-        transform: rotateY(12deg);
-      }
-    </style>
+    <!-- PrismJS Core and Languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+
     <script type="importmap">
 {
   "imports": {
@@ -127,13 +157,17 @@
     "react-router-dom": "https://esm.sh/react-router-dom@6.22.3?external=react,react-dom",
     "lucide-react": "https://esm.sh/lucide-react@0.344.0?external=react",
     "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "recharts": "https://esm.sh/recharts@2.12.3?external=react,react-dom",
+    "react-simple-code-editor": "https://esm.sh/react-simple-code-editor@0.13.1?external=react",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
   }
 }
 </script>
   </head>
-  <body class="bg-slate-50 text-slate-800 selection:bg-brand-100 selection:text-brand-900 dark:bg-slate-950 dark:text-slate-100 dark:selection:bg-brand-900 dark:selection:text-brand-50">
+  <body class="bg-slate-50 text-slate-800 selection:bg-brand-100 selection:text-brand-900 dark:bg-slate-950 dark:text-slate-100 dark:selection:bg-brand-900 dark:selection:text-brand-50 font-sans antialiased">
     <div id="root"></div>
   </body>
 </html>

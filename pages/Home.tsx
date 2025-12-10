@@ -1,464 +1,828 @@
-
 import React, { useEffect, useState, useRef } from 'react';
-import { ArrowRight, CheckCircle2, Play, Code, Smartphone, Terminal, Database, Globe, Briefcase, ShieldCheck, X, Plus, Minus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import {
+  ArrowRight, Terminal, Globe, Cpu, ShieldCheck,
+  Code, Smartphone, BrainCircuit, Rocket, Star,
+  Zap, CheckCircle2, TrendingUp, Users, Award, Timer,
+  ChevronDown, X, Gift, Sparkles, Briefcase, BookOpen, PenTool,
+  Layout, Database, Play, FileText, Mail, Trophy, Calendar,
+  UserPlus, ClipboardCheck
+} from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import SEO from '../components/SEO';
+import AIAssistant from '../components/AIAssistant';
+import { TESTIMONIALS } from '../constants';
 
-const Home: React.FC = () => {
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
-  const [showLearnMore, setShowLearnMore] = useState(false);
+// --- Helper Components ---
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const x = (e.clientX - innerWidth / 2) / innerWidth;
-      const y = (e.clientY - innerHeight / 2) / innerHeight;
-      setRotate({ x: y * -10, y: x * 10 }); // Multiplier adjusts sensitivity
-    };
+const TECH_ROW_1 = [
+  { name: "PYTHON", color: "bg-yellow-500" },
+  { name: "JAVA", color: "bg-red-500" },
+  { name: "C++", color: "bg-blue-600" },
+  { name: "JAVASCRIPT", color: "bg-yellow-300" },
+  { name: "TYPESCRIPT", color: "bg-blue-400" },
+  { name: "REACT", color: "bg-cyan-400" },
+  { name: "ANGULAR", color: "bg-red-600" },
+  { name: "VUE", color: "bg-green-500" },
+];
 
-    window.addEventListener('mousemove', handleMouseMove);
+const TECH_ROW_2 = [
+  { name: "NODE.JS", color: "bg-green-600" },
+  { name: "DOCKER", color: "bg-blue-500" },
+  { name: "KUBERNETES", color: "bg-blue-700" },
+  { name: "AWS", color: "bg-orange-500" },
+  { name: "GIT", color: "bg-red-500" },
+  { name: "LINUX", color: "bg-yellow-200" },
+  { name: "TENSORFLOW", color: "bg-orange-400" },
+  { name: "PYTORCH", color: "bg-red-400" },
+];
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
+const COMPANIES_ROW_1 = [
+  { name: "Google", color: "text-blue-600", bg: "group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20" },
+  { name: "Microsoft", color: "text-green-600", bg: "group-hover:bg-green-50 dark:group-hover:bg-green-900/20" },
+  { name: "Amazon", color: "text-yellow-600", bg: "group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/20" },
+  { name: "Meta", color: "text-blue-500", bg: "group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20" },
+  { name: "Netflix", color: "text-red-600", bg: "group-hover:bg-red-50 dark:group-hover:bg-red-900/20" },
+  { name: "Apple", color: "text-slate-800 dark:text-white", bg: "group-hover:bg-slate-100 dark:group-hover:bg-slate-800" },
+];
 
-  const FAQS = [
-    {
-      question: "How do I apply for an internship?",
-      answer: "To apply for the upcoming internship batch, simply fill out the Interest Form for your preferred domain. If selected, you will directly receive the Selection Certificate from us."
-    },
-    {
-      question: "Where can I find the Interest Form?",
-      answer: "All domain-wise Interest Forms are available in the internship section above. Click on the Apply Now button. Your responses help us understand your skills and whether you need any training during the internship."
-    },
-    {
-      question: "I have completed all the steps. What happens next?",
-      answer: "If you have filled the Interest Form correctly, you will receive your Selection Certificate before your internship starts. All important announcements are shared through the CodeAlpha Network discussion on LinkedIn."
-    },
-    {
-      question: "What is the duration of the internship?",
-      answer: "The duration of every internship domain is 4 weeks."
-    },
-    {
-      question: "I have completed my tasks early. When will I receive my certificate?",
-      answer: "You can submit your tasks through the Task Submission Form (if received). Otherwise, wait for it to be shared. If your tasks are submitted before the deadline, you will receive your Completion Certificate in the first week of the next month."
-    },
-    {
-      question: "Will I get a Letter of Recommendation (LOR)?",
-      answer: "Yes, interns who show exceptional performance and follow all rules may receive an LOR."
-    },
-    {
-      question: "Can beginners apply?",
-      answer: "Yes, beginners can apply. The Interest Form helps us understand your current skills, so we can support you better during the internship."
-    }
-  ];
+const COMPANIES_ROW_2 = [
+  { name: "Tesla", color: "text-red-700", bg: "group-hover:bg-red-50 dark:group-hover:bg-red-900/20" },
+  { name: "IBM", color: "text-blue-800", bg: "group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20" },
+  { name: "Oracle", color: "text-red-500", bg: "group-hover:bg-red-50 dark:group-hover:bg-red-900/20" },
+  { name: "Adobe", color: "text-red-600", bg: "group-hover:bg-red-50 dark:group-hover:bg-red-900/20" },
+  { name: "Intel", color: "text-blue-400", bg: "group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20" },
+  { name: "Samsung", color: "text-blue-700", bg: "group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20" },
+  { name: "Uber", color: "text-slate-900 dark:text-white", bg: "group-hover:bg-slate-100 dark:group-hover:bg-slate-800" },
+  { name: "LinkedIn", color: "text-blue-700", bg: "group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20" },
+];
 
-  return (
-    <div className="animate-in fade-in duration-500">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-slate-50 dark:bg-slate-950">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:[mask-image:linear-gradient(0deg,rgba(0,0,0,1),rgba(0,0,0,0.3))] -z-10"></div>
-        
-        {/* Floating Blobs */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-brand-400/20 dark:bg-brand-500/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-accent-400/10 dark:bg-accent-500/10 rounded-full blur-3xl animate-float-delayed"></div>
-        
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-brand-700 dark:text-brand-300 rounded-full text-sm font-semibold tracking-wide shadow-sm border border-brand-100 dark:border-brand-900/30 animate-in slide-in-from-bottom-4 duration-700">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-            </span>
-            <span className="text-slate-400 dark:text-slate-500 font-bold mr-1">..</span>
-            Launch your career in tech
-          </div>
-          
-          {/* 3D Heading Wrapper */}
-          <div className="perspective-1000 animate-in slide-in-from-bottom-8 duration-700 delay-100 py-2">
-            <h1 
-              className="text-5xl lg:text-7xl font-heading font-bold text-slate-900 dark:text-white leading-[1.1] mb-8 tracking-tight preserve-3d transition-transform duration-300 ease-out"
-              style={{ 
-                transform: `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`, 
-                textShadow: '0 10px 30px rgba(0,0,0,0.1)' 
-              }}
-            >
-              Practice your <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-kappel-500 inline-block">Skills</span><br />
-              Build your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-500 to-orange-500 inline-block">Future</span>
-            </h1>
-          </div>
-          
-          <p className="text-lg lg:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed animate-in slide-in-from-bottom-8 duration-700 delay-200">
-            Lay the foundation for your future prospects with expert-led virtual internships and certifications at CodeAlpha.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in slide-in-from-bottom-8 duration-700 delay-300">
-            <button 
-              onClick={() => setShowLearnMore(true)}
-              className="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-brand-500/30 transition-all hover:-translate-y-1 flex items-center justify-center gap-2 group"
-            >
-              Find Courses <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <Link 
-              to="/verification" 
-              className="w-full sm:w-auto bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-full font-semibold text-lg transition-all flex items-center justify-center gap-2 hover:shadow-lg"
-            >
-              Verify Certificate
-            </Link>
-          </div>
-
-          {/* Floating Icons for "IT" feel */}
-          <div className="absolute top-1/4 left-10 hidden lg:block animate-float">
-             <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-lg text-brand-500 dark:text-brand-400 border border-slate-100 dark:border-slate-700"><Code size={32} /></div>
-          </div>
-          <div className="absolute top-1/2 right-20 hidden lg:block animate-float-delayed">
-             <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-lg text-kappel-500 dark:text-kappel-400 border border-slate-100 dark:border-slate-700"><Globe size={32} /></div>
-          </div>
-          <div className="absolute bottom-1/4 right-10 hidden lg:block animate-float">
-             <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-lg text-accent-500 dark:text-accent-400 border border-slate-100 dark:border-slate-700"><Database size={32} /></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Learn More Modal */}
-      {showLearnMore && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in"
-            onClick={() => setShowLearnMore(false)}
-          ></div>
-          
-          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100 dark:border-slate-800">
-            {/* Header Image/Gradient */}
-            <div className="h-32 bg-gradient-to-r from-brand-600 to-kappel-500 relative">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-              <button 
-                onClick={() => setShowLearnMore(false)}
-                className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors backdrop-blur-sm"
-              >
-                <X size={20} />
-              </button>
-              <div className="absolute bottom-0 left-0 p-8">
-                <h2 className="text-3xl font-heading font-bold text-white">Program Highlights</h2>
-              </div>
-            </div>
-            
-            <div className="p-8">
-              <p className="text-slate-600 dark:text-slate-300 text-lg mb-8 leading-relaxed">
-                CodeAlpha provides a unique opportunity to gain industry-relevant skills through our structured virtual internship programs. Whether you are a beginner or looking to advance your skills, we have a path for you.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-4 mb-8">
-                 {[
-                    "4-Week Virtual Internship",
-                    "Real-world Project Experience",
-                    "Expert Mentorship & Guidance",
-                    "Verified Certificate of Completion",
-                    "Flexible Work Schedule",
-                    "Thriving Developer Community"
-                 ].map((item, i) => (
-                   <div key={i} className="flex items-center gap-3 text-slate-700 dark:text-slate-200 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                     <div className="text-brand-500 bg-brand-50 dark:bg-brand-900/30 p-1.5 rounded-full shrink-0">
-                       <CheckCircle2 size={18} />
-                     </div>
-                     <span className="font-medium text-sm">{item}</span>
-                   </div>
-                 ))}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <Link 
-                  to="/internships" 
-                  className="flex-1 bg-brand-600 hover:bg-brand-700 text-white py-3.5 rounded-xl font-bold text-center shadow-lg hover:shadow-brand-500/30 transition-all flex items-center justify-center gap-2 group"
-                >
-                  Explore All Courses <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <button 
-                  onClick={() => setShowLearnMore(false)}
-                  className="px-8 py-3.5 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Stats Section */}
-      <section className="py-16 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-            <StatCard value={384} suffix="K+" label="Registrations" />
-            <StatCard value={249} suffix="K+" label="Participants" />
-            <StatCard value={99.9} suffix="%" label="Satisfaction Rate" isFloat />
-            <StatCard value={25} suffix="+" label="Countries" />
-          </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="py-24 bg-slate-50 dark:bg-slate-950 relative transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <p className="text-brand-600 dark:text-brand-400 font-bold tracking-wide uppercase text-sm mb-2">Explore Categories</p>
-            <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white">
-              Virtual <span className="text-brand-600 dark:text-brand-400">Internships</span> for Remote Learning
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <CategoryCard 
-              icon={<Code size={32} />} 
-              title="Web Development" 
-              desc="Master the modern web stack with React, Node, and more."
-              color="bg-blue-500"
-              link="/internships?cat=development"
-            />
-            <CategoryCard 
-              icon={<Smartphone size={32} />} 
-              title="App Development" 
-              desc="Build intuitive iOS and Android applications."
-              color="bg-purple-500"
-              link="/internships?cat=development"
-            />
-            <CategoryCard 
-              icon={<Terminal size={32} />} 
-              title="Java Programming" 
-              desc="Core concepts to advanced enterprise applications."
-              color="bg-red-500"
-              link="/internships?cat=development"
-            />
-            <CategoryCard 
-              icon={<Database size={32} />} 
-              title="Data Science" 
-              desc="Analyze complex data and build ML models."
-              color="bg-green-500"
-              link="/internships?cat=ai"
-            />
-            <CategoryCard 
-              icon={<Briefcase size={32} />} 
-              title="Digital Marketing" 
-              desc="Learn SEO, SEM, and content strategies."
-              color="bg-orange-500"
-              link="/internships?cat=business"
-            />
-            <CategoryCard 
-              icon={<Globe size={32} />} 
-              title="Cloud Computing" 
-              desc="Deploy scalable apps on AWS and Azure."
-              color="bg-cyan-500"
-              link="/internships?cat=misc"
-            />
-            <CategoryCard 
-              icon={<ShieldCheck size={32} />} 
-              title="Cyber Security" 
-              desc="Protect systems and networks from attacks."
-              color="bg-indigo-500"
-              link="/internships?cat=misc"
-            />
-             <CategoryCard 
-              icon={<Code size={32} />} 
-              title="Python Programming" 
-              desc="Versatile coding for web and data."
-              color="bg-yellow-500"
-              link="/internships?cat=development"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-24 bg-white dark:bg-slate-900 transition-colors duration-300 relative">
-        {/* Background decoration for FAQ */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent"></div>
-        
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-             <span className="text-brand-600 dark:text-brand-400 font-bold tracking-wider text-sm uppercase mb-2 block">Support</span>
-             <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-6">
-               Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-kappel-500">Questions</span>
-             </h2>
-             <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-lg">
-               Got questions? We've got answers. Here's what students usually ask before joining.
-             </p>
-          </div>
-          
-          <div className="max-w-3xl mx-auto space-y-4 animate-in slide-in-from-bottom-8 duration-700 delay-100">
-            {FAQS.map((faq, index) => (
-              <FAQItem key={index} question={faq.question} answer={faq.answer} index={index} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Video/About Section */}
-      <section className="py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden transition-colors duration-300" id="about">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-             <div className="lg:w-1/2 relative group">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-white dark:border-slate-800 z-10 transition-colors duration-300">
-                  <img 
-                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80" 
-                    alt="Students working together" 
-                    className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all flex items-center justify-center">
-                     <a href="https://youtu.be/jLRZ1Sod_hA" target="_blank" rel="noreferrer" className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center pl-1 shadow-2xl animate-pulse group-hover:scale-110 transition-transform">
-                        <Play size={32} className="text-brand-600 fill-current ml-1" />
-                     </a>
-                  </div>
-                </div>
-                {/* Decorative Elements */}
-                <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-brand-100 dark:bg-brand-900/30 rounded-full blur-3xl -z-10"></div>
-                <div className="absolute -top-10 -left-10 w-64 h-64 bg-accent-100 dark:bg-accent-900/30 rounded-full blur-3xl -z-10"></div>
-             </div>
-             
-             <div className="lg:w-1/2">
-                <div className="inline-block px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-sm font-bold mb-4">About Us</div>
-                <h2 className="text-4xl lg:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-6 leading-tight">
-                  Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-kappel-500">CodeAlpha?</span>
-                </h2>
-                <p className="text-slate-600 dark:text-slate-300 mb-8 leading-relaxed text-lg">
-                  CodeAlpha is the country's quickest-growing pro training platform. We're all about shaping future tech creators. Our top internships and certifications show awesome results with over <span className="font-bold text-slate-900 dark:text-white">129,000+</span> alumni.
-                </p>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                  <FeatureItem text="Expert Trainers" />
-                  <FeatureItem text="Real Projects" />
-                  <FeatureItem text="Remote Learning" />
-                  <FeatureItem text="Lifetime Access" />
-                  <FeatureItem text="Verified Certificates" />
-                  <FeatureItem text="24/7 Support" />
-                </div>
-
-                <Link to="/internships" className="inline-flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold hover:gap-3 transition-all">
-                  Discover Opportunities <ArrowRight size={20} />
-                </Link>
-             </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Contact CTA */}
-      <section className="py-24 bg-slate-900 dark:bg-black text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-900 to-transparent opacity-50"></div>
-        
-        <div className="container mx-auto px-4 text-center relative z-10">
-           <h2 className="text-3xl md:text-5xl font-heading font-bold mb-6">Ready to Start Your Journey?</h2>
-           <p className="text-slate-300 mb-10 max-w-2xl mx-auto text-lg">
-             Join thousands of students who have transformed their careers with CodeAlpha's industry-standard internship programs.
-           </p>
-           <a href="https://forms.gle/s9TW7Tqi3tAQLCu78" target="_blank" rel="noreferrer" className="bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-brand-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 inline-flex items-center gap-2">
-             Register Now <ArrowRight size={20} />
-           </a>
-        </div>
-      </section>
+const TechCard: React.FC<{ name: string; color: string }> = ({ name, color }) => (
+    <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500 dark:hover:border-brand-500 transition-all duration-300 cursor-default group min-w-max">
+        <span className={`w-3 h-3 rounded-full ${color} group-hover:scale-125 transition-transform`}></span>
+        <span className="text-sm font-bold text-slate-700 dark:text-slate-300 tracking-wider">{name}</span>
     </div>
-  );
-};
+);
 
-const FAQItem: React.FC<{ question: string; answer: string; index: number }> = ({ question, answer, index }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div 
-      className={`bg-slate-50 dark:bg-slate-800/50 rounded-2xl border transition-all duration-300 hover:shadow-md ${isOpen ? 'border-brand-200 dark:border-brand-900/50 shadow-brand-100 dark:shadow-none' : 'border-slate-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-slate-600'}`}
-      style={{ animationDelay: `${index * 50}ms` }}
-    >
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-5 flex items-center justify-between text-left gap-4 focus:outline-none group"
-        aria-expanded={isOpen}
-      >
-        <span className={`font-bold text-lg transition-colors duration-300 ${isOpen ? 'text-brand-600 dark:text-brand-400' : 'text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400'}`}>
-          {question}
-        </span>
-        <div className={`p-2 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0 ${isOpen ? 'bg-brand-100 text-brand-600 rotate-180' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 group-hover:bg-brand-50 dark:group-hover:bg-slate-600'}`}>
-          {isOpen ? <Minus size={18} /> : <Plus size={18} />}
-        </div>
-      </button>
-      
-      <div 
-        className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
-      >
-        <div className="overflow-hidden">
-          <div className={`px-6 pb-6 transition-all duration-500 ease-in-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base border-t border-slate-100 dark:border-slate-700 pt-4">
-              {answer}
-            </p>
-          </div>
-        </div>
-      </div>
+const CompanyBadge: React.FC<{ name: string; color: string; bg: string }> = ({ name, color, bg }) => (
+    <div className={`group relative flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-500 hover:scale-110 hover:shadow-xl hover:-translate-y-1 cursor-default min-w-[200px]`}>
+        <div className={`absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 ${bg}`}></div>
+        <Briefcase size={18} className={`relative z-10 transition-colors duration-300 text-slate-400 group-hover:text-current ${color}`} />
+        <span className={`relative z-10 text-lg font-bold text-slate-500 transition-colors duration-300 group-hover:text-current ${color}`}>{name}</span>
     </div>
-  );
-};
+);
 
-const StatCard: React.FC<{value: number, suffix: string, label: string, isFloat?: boolean}> = ({ value, suffix, label, isFloat }) => {
+const AnimatedStat: React.FC<{ end: number; suffix?: string; label: string }> = ({ end, suffix = "", label }) => {
   const [count, setCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          let start = 0;
-          const end = value;
-          const duration = 2000;
-          const increment = end / (duration / 16);
-          
-          const timer = setInterval(() => {
-            start += increment;
-            if (start >= end) {
-              setCount(end);
-              clearInterval(timer);
-            } else {
-              setCount(isFloat ? parseFloat(start.toFixed(1)) : Math.floor(start));
-            }
-          }, 16);
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 } // Start when 30% visible
     );
 
-    if (ref.current) observer.observe(ref.current);
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
     return () => observer.disconnect();
-  }, [value, hasAnimated, isFloat]);
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let startTimestamp: number | null = null;
+    const duration = 2500; // 2.5 seconds duration
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      // Ease out quart
+      const ease = 1 - Math.pow(1 - progress, 4);
+      
+      setCount(Math.floor(ease * end));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        setCount(end); // Ensure exact end value
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [isVisible, end]);
 
   return (
-    <div ref={ref} className="text-center p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-slate-50 dark:border-slate-700 group">
-      <h3 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-slate-400 mb-2 group-hover:scale-110 transition-transform duration-300">
-        {count}{suffix}
-      </h3>
-      <p className="text-brand-600 dark:text-brand-400 font-bold uppercase text-sm tracking-wider">{label}</p>
+    <div ref={ref} className="text-center p-6 transform hover:scale-105 transition-transform duration-300 group">
+      <div className="text-4xl lg:text-6xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600 dark:from-brand-400 dark:to-purple-400 mb-2 drop-shadow-sm group-hover:from-purple-600 group-hover:to-brand-600 transition-all">
+        {count >= 1000 ? (count / 1000).toFixed(0) + 'K' : count}{suffix}
+      </div>
+      <div className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors">{label}</div>
     </div>
   );
 };
 
-const CategoryCard: React.FC<{ icon: React.ReactNode, title: string, desc: string, color: string, link: string }> = ({ icon, title, desc, color, link }) => (
-  <Link to={link} className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-700 transition-all duration-300 group cursor-pointer hover:-translate-y-2 h-full flex flex-col">
-    <div className={`${color} w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg group-hover:rotate-6 transition-transform duration-300`}>
-      {icon}
+const ScrambleText: React.FC<{ text: string; className?: string }> = ({ text, className }) => {
+  const [displayText, setDisplayText] = useState(text);
+  const [isHovered, setIsHovered] = useState(false);
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+
+  useEffect(() => {
+    let interval: any;
+    let iteration = 0;
+
+    const startScramble = () => {
+      clearInterval(interval);
+      iteration = 0;
+      
+      interval = setInterval(() => {
+        setDisplayText(prev => 
+          text
+            .split("")
+            .map((letter, index) => {
+              if (index < iteration) {
+                return text[index];
+              }
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join("")
+        );
+
+        if (iteration >= text.length) {
+          clearInterval(interval);
+        }
+
+        iteration += 1 / 3;
+      }, 30);
+    };
+
+    // Trigger on mount
+    startScramble();
+
+    // Trigger on hover if needed
+    if (isHovered) {
+        startScramble();
+    }
+
+    return () => clearInterval(interval);
+  }, [text, isHovered]);
+
+  return (
+    <span 
+        className={className} 
+        onMouseEnter={() => setIsHovered(true)} 
+        onMouseLeave={() => setIsHovered(false)}
+    >
+        {displayText}
+    </span>
+  );
+};
+
+const DomainCard: React.FC<{ icon: any, title: string, description: string, color: string, to: string, cta?: string }> = ({ icon: Icon, title, description, color, to, cta = "Apply Now" }) => (
+  <Link to={to} className="group relative p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full flex flex-col">
+    <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${color} opacity-10 rounded-bl-[100px] transition-all group-hover:scale-150`}></div>
+    <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br ${color} text-white shadow-md group-hover:scale-110 transition-transform`}>
+      <Icon size={28} />
     </div>
-    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{title}</h3>
-    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">{desc}</p>
-    <div className="flex items-center text-sm font-semibold text-slate-400 dark:text-slate-500 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-      Explore <ArrowRight size={16} className="ml-2" />
-    </div>
+    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{title}</h3>
+    <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed flex-grow">
+      {description}
+    </p>
+    <span className="inline-flex items-center text-sm font-bold text-brand-600 dark:text-brand-400 group-hover:translate-x-2 transition-transform mt-auto">
+      {cta} <ArrowRight size={16} className="ml-1" />
+    </span>
   </Link>
 );
 
-const FeatureItem: React.FC<{ text: string }> = ({ text }) => (
-  <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
-    <div className="bg-green-100 dark:bg-green-900/30 p-1 rounded-full shrink-0">
-       <CheckCircle2 size={16} className="text-green-600 dark:text-green-400" />
+const ProcessStep: React.FC<{ number: string, title: string, description: string, icon: any, delay: string }> = ({ number, title, description, icon: Icon, delay }) => (
+    <div className={`relative flex flex-col items-center text-center p-6 z-10 group ${delay}`}>
+        {/* Animated Icon Container */}
+        <div className="w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 border-4 border-slate-50 dark:border-slate-700 shadow-xl flex items-center justify-center text-brand-600 dark:text-brand-400 mb-6 relative transition-all duration-500 transform group-hover:scale-110 group-hover:-translate-y-2 group-hover:rotate-3 group-hover:border-brand-200 dark:group-hover:border-brand-800">
+            <div className="absolute inset-0 bg-brand-500/10 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <Icon size={32} />
+            <div className="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 text-white text-sm font-bold flex items-center justify-center border-4 border-white dark:border-slate-900 shadow-md">
+               {number}
+            </div>
+        </div>
+        
+        {/* Content */}
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brand-600 transition-colors">{title}</h3>
+        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-xs">{description}</p>
     </div>
-    <span className="text-slate-700 dark:text-slate-200 font-medium text-sm">{text}</span>
+);
+
+const BenefitItem: React.FC<{ icon: any, title: string, description: string }> = ({ icon: Icon, title, description }) => (
+  <div className="flex flex-col items-center text-center p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+    <div className="w-12 h-12 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl flex items-center justify-center mb-4 shadow-sm border border-brand-100 dark:border-brand-800">
+      <Icon size={24} />
+    </div>
+    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
+    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{description}</p>
   </div>
 );
+
+const Home: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const [showReferralToast, setShowReferralToast] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+        setReferralCode(ref);
+        setShowReferralToast(true);
+        localStorage.setItem('referred_by', ref);
+        const timer = setTimeout(() => setShowReferralToast(false), 8000);
+        return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
+  const FAQS = [
+    { question: "Is the internship really free?", answer: "Yes! Our virtual internships are 100% free. We believe in democratizing education and providing equal opportunities for all students." },
+    { question: "How do I receive the certificate?", answer: "Upon successful completion of the assigned tasks within the 4-week duration, you will receive a verifiable completion certificate via email." },
+    { question: "Can I apply for multiple domains?", answer: "Yes, you can apply for multiple domains if you have the required skills and time to manage the tasks." },
+    { question: "Is there any selection process?", answer: "We have a screening process based on your application form details. Make sure to fill it out carefully." },
+    { question: "Is it work from home?", answer: "Yes, all our internships are Virtual (Remote). You can work from anywhere." }
+  ];
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CodeAlpha",
+    "url": "https://codealpha.tech",
+    "logo": "https://drive.google.com/thumbnail?id=1PuN2sdYkGURRFXlGd_zAjXQrYzmPaOhi&sz=w200",
+    "description": "The ultimate student ecosystem offering Virtual Internships, Online Compilers, and Career Tools.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91 9336576683",
+      "contactType": "customer service",
+      "email": "services@codealpha.tech",
+      "areaServed": "IN",
+      "availableLanguage": "English"
+    }
+  };
+
+  return (
+    <div className="animate-in fade-in duration-500 overflow-x-hidden font-sans bg-slate-50 dark:bg-slate-950">
+      <SEO
+        title="Home"
+        description="CodeAlpha: The ultimate student ecosystem. Virtual internships, Online Compiler, Tutorials, and Interview Prep all in one place to boost your career."
+        image="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80"
+        keywords={['CodeAlpha', 'Internships', 'Student Ecosystem', 'Online Compiler', 'Interview Preparation', 'Tech Tutorials', 'Virtual Internship', 'EdTech']}
+        schema={organizationSchema}
+      />
+
+      <AIAssistant
+        title="CodeAlpha Guide"
+        pageContext="Home Page. CodeAlpha offers Virtual Internships in Web Dev, App Dev, etc. It's free."
+      />
+      
+      {/* Custom Styles for Reverse Scroll */}
+      <style>{`
+        @keyframes scroll-reverse {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+        .animate-scroll-reverse {
+          animation: scroll-reverse 40s linear infinite;
+        }
+      `}</style>
+
+      {/* Referral Toast */}
+      {showReferralToast && (
+          <div className="fixed top-24 right-6 z-50 bg-white dark:bg-slate-900 border-l-4 border-green-500 rounded-r-xl shadow-2xl p-5 max-w-sm animate-in slide-in-from-right-8 duration-500 flex items-start gap-4">
+             <div className="bg-green-100 dark:bg-green-900/30 p-2.5 rounded-full text-green-600 dark:text-green-400 shrink-0">
+                 <Gift size={24} />
+             </div>
+             <div className="flex-1">
+                 <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">Welcome, Friend!</h4>
+                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Referred by <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 px-1 rounded">{referralCode}</span>. Apply now!
+                 </p>
+             </div>
+             <button onClick={() => setShowReferralToast(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><X size={18} /></button>
+          </div>
+      )}
+
+      {/* --- HERO SECTION --- */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute top-0 left-0 w-full h-full bg-white dark:bg-slate-950 -z-20"></div>
+        {/* Blobs */}
+        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-500/20 rounded-full blur-[100px] -z-10 animate-blob"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-[100px] -z-10 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-pink-500/20 rounded-full blur-[80px] -z-10 animate-blob animation-delay-4000"></div>
+        
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-bold uppercase tracking-wider mb-8 animate-fade-up">
+             <Sparkles size={14} /> #1 Platform for Virtual Internships
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight leading-[1.1]">
+            <span className="block animate-fade-up" style={{ animationDelay: '0.1s' }}>Where Learning Meets</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-purple-600 to-brand-600 bg-300% animate-shimmer min-h-[1.1em] mt-2 cursor-pointer pb-2">
+                <ScrambleText text="Real World Experience" />
+            </span>
+          </h1>
+          
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            Kickstart your career with our free virtual internship program. Gain hands-on experience, work on live projects, and get certified.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+            <Link 
+              to="/internships"
+              className="w-full sm:w-auto px-8 py-4 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold shadow-xl hover:shadow-2xl hover:shadow-brand-500/20 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2"
+            >
+              Apply for Internship <ArrowRight size={20} />
+            </Link>
+            <Link 
+              to="/verification"
+              className="w-full sm:w-auto px-8 py-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-white dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+            >
+              Verify Certificate <ShieldCheck size={20} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* --- STATS BANNER (Animated) --- */}
+      <section className="py-16 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800">
+         <div className="container mx-auto px-4">
+             <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-100 dark:divide-slate-800 gap-y-8 md:gap-y-0">
+                 <AnimatedStat end={980} suffix="K+" label="Registered Students" />
+                 <AnimatedStat end={671} suffix="K+" label="Certificates Issued" />
+                 <AnimatedStat end={25} suffix="+" label="Countries" />
+                 <AnimatedStat end={100} suffix="%" label="Free & Online" />
+             </div>
+         </div>
+      </section>
+
+      {/* --- BENEFITS SECTION --- */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-950">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
+              Why Choose <span className="text-brand-600">CodeAlpha?</span>
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              We provide the tools and platform you need to launch your tech career, completely free of charge.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <BenefitItem 
+              icon={Zap} 
+              title="100% Free" 
+              description="No hidden fees or charges. We believe quality education should be accessible to everyone." 
+            />
+            <BenefitItem 
+              icon={Calendar} 
+              title="Flexible Schedule" 
+              description="Learn at your own pace. Manage your internship tasks alongside your college studies." 
+            />
+            <BenefitItem 
+              icon={ShieldCheck} 
+              title="Verified Certificates" 
+              description="Earn a certificate with a unique ID that recruiters can instantly verify on our portal." 
+            />
+            <BenefitItem 
+              icon={Briefcase} 
+              title="Real-World Projects" 
+              description="Stop watching tutorials. Build actual projects that you can showcase in your portfolio." 
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* --- TECH STACK MARQUEE (Double) --- */}
+      <section className="py-24 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 overflow-hidden relative group">
+          <div className="container mx-auto px-4 mb-12 text-center">
+             <span className="text-brand-600 dark:text-brand-400 font-bold tracking-wider text-sm uppercase mb-2 block">Skills</span>
+             <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
+                Technologies You Will <span className="text-brand-600">Master</span>
+             </h2>
+          </div>
+
+          {/* Gradient Masks */}
+          <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none"></div>
+          
+          <div className="flex flex-col gap-6">
+            {/* Row 1: Left Scroll */}
+            <div className="flex animate-scroll w-max gap-6 items-center group-hover:[animation-play-state:paused]">
+                {[...TECH_ROW_1, ...TECH_ROW_1, ...TECH_ROW_1, ...TECH_ROW_1].map((tech, i) => (
+                    <TechCard key={`r1-${i}`} name={tech.name} color={tech.color} />
+                ))}
+            </div>
+            
+            {/* Row 2: Right Scroll */}
+            <div className="flex animate-scroll-reverse w-max gap-6 items-center group-hover:[animation-play-state:paused]">
+                {[...TECH_ROW_2, ...TECH_ROW_2, ...TECH_ROW_2, ...TECH_ROW_2].map((tech, i) => (
+                    <TechCard key={`r2-${i}`} name={tech.name} color={tech.color} />
+                ))}
+            </div>
+          </div>
+      </section>
+
+      {/* --- PLACEMENT SUCCESS MARQUEE (Double Animated Rows) --- */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 overflow-hidden relative group">
+          <div className="container mx-auto px-4 mb-16 text-center">
+             <span className="text-brand-600 dark:text-brand-400 font-bold tracking-wider text-sm uppercase mb-2 block">Success Stories</span>
+             <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
+                Our Alumni Work At <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600">Top MNCs</span>
+             </h2>
+             <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                Join a network of students who have secured positions at the world's leading technology companies.
+             </p>
+          </div>
+          
+          {/* Gradient Masks */}
+          <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute inset-y-0 right-0 w-48 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+
+          <div className="flex flex-col gap-8">
+             {/* Row 1: Left Scroll */}
+             <div className="flex animate-scroll w-max gap-8 items-center group-hover:[animation-play-state:paused]">
+                 {[...COMPANIES_ROW_1, ...COMPANIES_ROW_1, ...COMPANIES_ROW_1].map((company, i) => (
+                     <CompanyBadge key={`r1-${i}`} name={company.name} color={company.color} bg={company.bg} />
+                 ))}
+             </div>
+             
+             {/* Row 2: Right Scroll */}
+             <div className="flex animate-scroll-reverse w-max gap-8 items-center group-hover:[animation-play-state:paused]">
+                 {[...COMPANIES_ROW_2, ...COMPANIES_ROW_2, ...COMPANIES_ROW_2].map((company, i) => (
+                     <CompanyBadge key={`r2-${i}`} name={company.name} color={company.color} bg={company.bg} />
+                 ))}
+             </div>
+          </div>
+      </section>
+
+      {/* --- CERTIFICATE PREVIEW SECTION --- */}
+      <section className="py-24 bg-gradient-to-b from-slate-900 to-slate-950 text-white overflow-hidden relative">
+          {/* Background Elements */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center gap-12">
+              <div className="lg:w-1/2 animate-in slide-in-from-left-8 duration-700">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 mb-6 backdrop-blur-md">
+                      <Award size={16} className="text-yellow-400" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Verified Credential</span>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6 leading-tight">
+                      Earn a Recognized <br/>
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">Certificate of Completion</span>
+                  </h2>
+                  <p className="text-slate-300 text-lg mb-8 leading-relaxed">
+                      Showcase your achievement. Our certificates come with a unique verification ID that can be verified instantly on our platform. Add it to your LinkedIn profile and resume to stand out to recruiters.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                      <Link to="/internships" className="bg-white text-slate-900 px-8 py-3.5 rounded-xl font-bold hover:bg-brand-50 transition-colors inline-flex items-center justify-center gap-2">
+                          Start Your Journey <ArrowRight size={18}/>
+                      </Link>
+                      <Link to="/verification" className="bg-transparent border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/10 transition-colors inline-flex items-center justify-center gap-2">
+                          Verify a Certificate <CheckCircle2 size={18}/>
+                      </Link>
+                  </div>
+              </div>
+              
+              <div className="lg:w-1/2 relative group perspective-1000">
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-500 to-purple-600 rounded-2xl blur-2xl opacity-30 group-hover:opacity-50 transition-opacity duration-500 animate-pulse-slow"></div>
+                  
+                  {/* Certificate Container with 3D Float Animation */}
+                  <div className="relative transform transition-transform duration-700 hover:scale-[1.02] animate-float shadow-2xl rounded-2xl">
+                      <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-800">
+                          {/* Using the Google Drive Thumbnail as requested */}
+                          <img 
+                            src="https://drive.google.com/thumbnail?id=1JX3zGkpWF1zHT8SkOVWcEymLCcukwfdy&sz=w1000" 
+                            alt="CodeAlpha Sample Certificate" 
+                            className="w-full h-auto object-cover opacity-95 group-hover:opacity-100 transition-opacity"
+                          />
+                          {/* Overlay Glint Effect */}
+                          <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 skew-x-12 translate-x-[-200%] group-hover:animate-shimmer pointer-events-none"></div>
+                      </div>
+                      
+                      {/* Floating Badge */}
+                      <div className="absolute -bottom-6 -right-6 bg-white text-slate-900 p-4 rounded-xl shadow-xl flex items-center gap-3 animate-bounce duration-[3000ms]">
+                          <div className="bg-green-100 p-2 rounded-full text-green-600">
+                              <ShieldCheck size={24} />
+                          </div>
+                          <div>
+                              <p className="text-xs font-bold text-slate-500 uppercase">Status</p>
+                              <p className="font-bold">Verified & Valid</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      {/* --- INTERNSHIP DOMAINS --- */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-950">
+         <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+               <span className="text-brand-600 dark:text-brand-400 font-bold tracking-wider text-sm uppercase mb-2 block">Opportunities</span>
+               <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
+                  Explore Our <span className="text-brand-600">Internships</span>
+               </h2>
+               <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                  Choose from a variety of domains to build your skills. All internships are 4 weeks long and project-based.
+               </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+               <DomainCard 
+                  icon={Globe} 
+                  title="Web Development" 
+                  description="Build modern, responsive websites using HTML, CSS, JavaScript, and React. Work on real-world projects." 
+                  color="from-blue-500 to-cyan-400"
+                  to="/internships"
+               />
+               <DomainCard 
+                  icon={Smartphone} 
+                  title="App Development" 
+                  description="Create mobile applications for Android using Java/Kotlin or cross-platform apps with Flutter." 
+                  color="from-green-500 to-emerald-400"
+                  to="/internships"
+               />
+               <DomainCard 
+                  icon={BrainCircuit} 
+                  title="Machine Learning" 
+                  description="Dive into AI/ML. Work with Python, TensorFlow, and Scikit-learn to build predictive models." 
+                  color="from-purple-500 to-indigo-400"
+                  to="/internships"
+               />
+               <DomainCard 
+                  icon={Terminal} 
+                  title="C++ Programming" 
+                  description="Master the fundamentals of C++ and Object-Oriented Programming through practical tasks." 
+                  color="from-red-500 to-orange-400"
+                  to="/internships"
+               />
+               <DomainCard 
+                  icon={Code} 
+                  title="Java Programming" 
+                  description="Learn Java core concepts, collections, and build robust console-based applications." 
+                  color="from-orange-500 to-amber-400"
+                  to="/internships"
+               />
+               <DomainCard 
+                  icon={PenTool} 
+                  title="Graphic Design" 
+                  description="Unleash your creativity. Design social media posts, logos, and UI/UX mockups." 
+                  color="from-pink-500 to-rose-400"
+                  to="/internships"
+               />
+            </div>
+            
+            <div className="text-center mt-12">
+                <Link to="/internships" className="inline-flex items-center font-bold text-slate-900 dark:text-white border-b-2 border-brand-500 hover:text-brand-600 transition-colors">
+                    View All Domains <ArrowRight size={16} className="ml-2"/>
+                </Link>
+            </div>
+         </div>
+      </section>
+
+      {/* --- HOW IT WORKS --- */}
+      <section className="py-24 bg-white dark:bg-slate-900 relative overflow-hidden">
+         {/* Background Pattern */}
+         <div className="absolute inset-0 opacity-30 dark:opacity-10" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+         
+         <div className="container mx-auto px-4 relative z-10">
+            <div className="text-center mb-20">
+               <span className="text-brand-600 dark:text-brand-400 font-bold tracking-wider text-sm uppercase mb-2 block">Process</span>
+               <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white">How It <span className="text-brand-600">Works?</span></h2>
+            </div>
+
+            <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Connecting Line (Desktop) */}
+                <div className="hidden lg:block absolute top-10 left-[12%] right-[12%] h-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent -z-10">
+                    <div className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-transparent via-brand-500/50 to-transparent animate-pulse"></div>
+                </div>
+
+                <ProcessStep 
+                    number="01" 
+                    title="Apply" 
+                    description="Fill out the simple registration form. It's completely free and takes less than 2 minutes."
+                    icon={UserPlus}
+                    delay="animate-in fade-in slide-in-from-bottom-8 duration-700"
+                />
+                <ProcessStep 
+                    number="02" 
+                    title="Selection" 
+                    description="Get your selection letter via email. Join our community channels for updates."
+                    icon={Mail}
+                    delay="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100"
+                />
+                <ProcessStep 
+                    number="03" 
+                    title="Complete Tasks" 
+                    description="Receive task lists for your domain. Complete them within the 4-week deadline."
+                    icon={ClipboardCheck}
+                    delay="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200"
+                />
+                <ProcessStep 
+                    number="04" 
+                    title="Get Certified" 
+                    description="Submit your work. Upon verification, receive your internship completion certificate."
+                    icon={Award}
+                    delay="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300"
+                />
+            </div>
+         </div>
+      </section>
+
+      {/* --- AI TOOLS SPOTLIGHT --- */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 relative overflow-hidden">
+          {/* Background blobs for visual interest */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10"></div>
+
+          <div className="container mx-auto px-4">
+              <div className="text-center mb-16 max-w-3xl mx-auto">
+                  <span className="text-brand-600 dark:text-brand-400 font-bold tracking-wider text-sm uppercase mb-2 block">Career Boosters</span>
+                  <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white mb-4">
+                      Free <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600">AI Career Tools</span>
+                  </h2>
+                  <p className="text-slate-600 dark:text-slate-400 text-lg mb-6">
+                      Stop getting rejected by robots. Use our AI-powered toolkit to optimize your resume, beat the ATS, and connect with recruiters instantly.
+                  </p>
+                  {/* Removed Practice Coding Link as requested */}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                   {/* Tool 1: ATS Score */}
+                   <DomainCard 
+                      icon={TrendingUp} 
+                      title="Check ATS Score" 
+                      description="Is your resume beating the bots? Upload your CV to get an instant score out of 100 and actionable improvements." 
+                      color="from-blue-500 to-cyan-400"
+                      to="/ats-score"
+                      cta="Check Now"
+                   />
+                   {/* Tool 2: Email Generator */}
+                   <DomainCard 
+                      icon={Mail} 
+                      title="Job Email Builder" 
+                      description="Generate professional cold emails in seconds and get a curated list of HR contacts from top tech companies." 
+                      color="from-purple-500 to-indigo-400"
+                      to="/email-generator"
+                      cta="Generate Email"
+                   />
+                   {/* Tool 3: Resume Scanner */}
+                   <DomainCard 
+                      icon={FileText} 
+                      title="AI Resume Scanner" 
+                      description="Compare your resume against job descriptions to see how well you match and what keywords are missing." 
+                      color="from-pink-500 to-rose-400"
+                      to="/interview-prep/resume-scanner"
+                      cta="Scan Resume"
+                   />
+              </div>
+
+              {/* New Row for Practice, Tutorials, Quiz, Compiler */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                   {/* Tool 4: Coding Practice */}
+                   <DomainCard 
+                      icon={Terminal} 
+                      title="Coding Practice" 
+                      description="Sharpen your coding skills with exercises in C, C++, Java, and Python. Solve problems from basics to advanced." 
+                      color="from-emerald-500 to-teal-400"
+                      to="/practice"
+                      cta="Start Coding"
+                   />
+                   {/* Tool 5: Online Compiler */}
+                   <DomainCard 
+                      icon={Code} 
+                      title="Online Compiler" 
+                      description="Write, compile, and run code in 5+ languages instantly. Includes AI debugging and 'Hello CodeAlpha' templates." 
+                      color="from-cyan-500 to-blue-400"
+                      to="/code-playground"
+                      cta="Open Compiler"
+                   />
+                   {/* Tool 6: Tutorials */}
+                   <DomainCard 
+                      icon={BookOpen} 
+                      title="Tech Tutorials" 
+                      description="Comprehensive guides and roadmaps for Data Structures, Algorithms, Web Development, and more." 
+                      color="from-orange-500 to-amber-400"
+                      to="/tutorials"
+                      cta="Start Learning"
+                   />
+                   {/* Tool 7: Quiz */}
+                   <DomainCard 
+                      icon={Trophy} 
+                      title="Quiz Registration" 
+                      description="Test your knowledge, complete challenges, and win badges. Register for our monthly tech quizzes." 
+                      color="from-red-500 to-rose-400"
+                      to="/quiz"
+                      cta="Register Now"
+                   />
+              </div>
+          </div>
+      </section>
+
+      {/* --- TESTIMONIALS --- */}
+      <section className="py-24 bg-white dark:bg-slate-900 overflow-hidden">
+         <div className="container mx-auto px-4 mb-12 text-center">
+             <h2 className="text-3xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white">Student <span className="text-brand-600">Reviews</span></h2>
+         </div>
+         
+         <div className="relative w-full">
+             <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10"></div>
+             <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10"></div>
+             
+             <div className="flex animate-scroll gap-6 w-max hover:[animation-play-state:paused] px-4">
+                 {[...TESTIMONIALS, ...TESTIMONIALS].map((item, index) => (
+                    <div key={`${item.id}-${index}`} className="w-80 md:w-96 bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col shadow-sm">
+                        <div className="flex gap-1 mb-4">
+                             {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />
+                             ))}
+                        </div>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm mb-6 leading-relaxed flex-1">"{item.content}"</p>
+                        <div className="flex items-center gap-3 border-t border-slate-200 dark:border-slate-700 pt-4">
+                             <div className="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-300 flex items-center justify-center font-bold text-sm">
+                                {item.name.charAt(0)}
+                             </div>
+                             <div>
+                                 <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[160px]">{item.name}</p>
+                                 <p className="text-xs text-slate-500 dark:text-slate-400">{item.role}</p>
+                             </div>
+                        </div>
+                    </div>
+                 ))}
+             </div>
+         </div>
+      </section>
+
+      {/* --- FAQ SECTION --- */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-950">
+         <div className="container mx-auto px-4 max-w-3xl">
+             <div className="text-center mb-16">
+                 <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 dark:text-white mb-4">Frequently Asked Questions</h2>
+                 <p className="text-slate-600 dark:text-slate-400">Got questions? We've got answers.</p>
+             </div>
+             
+             <div className="space-y-4">
+                 {FAQS.map((faq, index) => (
+                    <div key={index} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                        <button 
+                           onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                           className="w-full flex items-center justify-between p-6 text-left font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                           <span className="text-lg">{faq.question}</span>
+                           <ChevronDown 
+                             size={20} 
+                             className={`text-slate-400 transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180' : ''}`} 
+                           />
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className="p-6 pt-0 text-slate-600 dark:text-slate-400 leading-relaxed">
+                                {faq.answer}
+                            </div>
+                        </div>
+                    </div>
+                 ))}
+             </div>
+         </div>
+      </section>
+
+      {/* --- FINAL CTA --- */}
+      <section className="py-24 bg-white dark:bg-slate-900">
+          <div className="container mx-auto px-4">
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-brand-900/40 dark:to-slate-900 rounded-[2.5rem] p-8 md:p-20 text-center relative overflow-hidden shadow-2xl">
+                  {/* Background decorations */}
+                  <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.2)_0,transparent_70%)]"></div>
+                  
+                  <div className="relative z-10 max-w-3xl mx-auto">
+                      <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-8">Ready to start your career?</h2>
+                      <p className="text-slate-300 text-lg mb-10 leading-relaxed">
+                          Join thousands of students who are already building their future with CodeAlpha. It's free, flexible, and career-focused.
+                      </p>
+                      <div className="flex flex-col sm:flex-row justify-center gap-4">
+                          <Link to="/internships" className="px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-brand-50 transition-all shadow-xl hover:scale-105">
+                              Apply Now
+                          </Link>
+                          <Link to="/contact" className="px-8 py-4 bg-transparent border border-slate-600 text-white rounded-xl font-bold hover:bg-white/10 transition-all">
+                              Contact Support
+                          </Link>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+    </div>
+  );
+};
 
 export default Home;

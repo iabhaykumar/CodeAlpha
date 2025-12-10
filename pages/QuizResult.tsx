@@ -1,10 +1,10 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Trophy, Search, Loader2, CheckCircle2, XCircle, BrainCircuit, Share2, Check, Download, Link as LinkIcon, Twitter, Linkedin, Copy } from 'lucide-react';
 import { MOCK_QUIZ_RESULTS } from '../constants';
 import { QuizResult } from '../types';
 import html2canvas from 'html2canvas';
+import AIAssistant from '../components/AIAssistant';
 
 const QuizResultPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,9 +35,10 @@ const QuizResultPage: React.FC = () => {
       if (data) {
         setResult(data);
         // Update URL without reloading to allow easy sharing if user typed it manually
-        setSearchParams({ id: code.trim() });
+        setSearchParams({ id: code.trim() }, { replace: true });
       } else {
         setError('Invalid Quiz ID. Please check your code and try again.');
+        setSearchParams({}, { replace: true }); // Clear invalid ID from URL
       }
       setLoading(false);
     }, 1500);
@@ -177,6 +178,12 @@ const QuizResultPage: React.FC = () => {
        <div className="absolute top-20 right-10 w-72 h-72 bg-brand-400/20 rounded-full blur-3xl animate-float"></div>
        <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent-400/10 rounded-full blur-3xl animate-float-delayed"></div>
 
+       <AIAssistant 
+        title="Results Helper"
+        pageContext="You are a Results Assistant for CodeAlpha Quizzes. Explain how to check results using the Quiz ID, how rankings are calculated, and how to share the achievement certificate."
+        suggestions={["How to check result?", "How is rank calculated?", "Share my result"]}
+      />
+
        <div className="container mx-auto px-4">
             <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <span className="inline-block px-4 py-1.5 rounded-full bg-yellow-100 text-yellow-700 text-sm font-bold uppercase tracking-wider mb-4 border border-yellow-200">
@@ -235,9 +242,8 @@ const QuizResultPage: React.FC = () => {
                                     <div className="flex items-center gap-4">
                                         <div className="bg-white/95 p-2.5 rounded-xl shadow-lg border border-white/10">
                                             <img 
-                                                src="/logo-bg.png" 
+                                                src="https://drive.google.com/thumbnail?id=1-yXWiKJsXQ8umSLtjhBWIGs5u_7nanND&sz=w1000" 
                                                 alt="CodeAlpha" 
-                                                crossOrigin="anonymous"
                                                 className="h-10 w-auto object-contain"
                                             />
                                         </div>

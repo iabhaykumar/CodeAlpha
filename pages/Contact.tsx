@@ -1,6 +1,7 @@
-
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle } from 'lucide-react';
+import AIAssistant from '../components/AIAssistant';
+import SEO from '../components/SEO';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -52,10 +53,21 @@ const Contact: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20 relative overflow-hidden">
+      <SEO 
+        title="Contact Us" 
+        description="Get in touch with CodeAlpha. Have questions about our internships or services? We're here to help. Contact us via email or phone."
+        keywords={['Contact CodeAlpha', 'Support', 'Help Center', 'CodeAlpha Email', 'Customer Service']}
+      />
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
       <div className="absolute top-20 left-10 w-72 h-72 bg-brand-400/20 rounded-full blur-3xl animate-float"></div>
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-400/10 rounded-full blur-3xl animate-float-delayed"></div>
+
+      <AIAssistant 
+        title="Support Agent"
+        pageContext="You are a Support Agent for CodeAlpha. Provide contact details: services@codealpha.tech, location: Lucknow, India. Standard response time is 24-48 hours. Answer general queries about support channels."
+        suggestions={["Email address?", "Response time?", "Partnership inquiry", "Office location"]}
+      />
 
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">

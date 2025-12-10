@@ -1,5 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar, ArrowRight, Clock } from 'lucide-react';
+import SEO from '../components/SEO';
+import AIAssistant from '../components/AIAssistant';
 
 const QuizRegistration: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -57,6 +60,17 @@ const QuizRegistration: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20 relative overflow-hidden flex items-center justify-center">
+      <SEO 
+        title="Tech Quiz Registration" 
+        description="Register for CodeAlpha's monthly Tech Quiz. Test your knowledge in coding, win badges, and get recognized in our developer community." 
+      />
+
+      <AIAssistant 
+        title="Quiz Master"
+        pageContext="You are a Quiz Master assistant for CodeAlpha. Explain the monthly tech quiz schedule (held on the 5th of every month), the registration process (via Google Form), and how results/ranks are generated."
+        suggestions={["When is the next quiz?", "How do I register?", "Is there a prize?"]}
+      />
+
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
       <div className="absolute top-20 left-10 w-72 h-72 bg-brand-400/20 rounded-full blur-3xl animate-float"></div>

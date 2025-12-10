@@ -3,19 +3,44 @@ import { Internship, NavItem, FeedbackItem } from './types';
 
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Home', path: '/' },
-  { label: 'Internships', path: '/internships' },
-  { label: 'Interview Prep', path: '/interview-prep' },
-  { label: 'Verification', path: '/verification' },
   { 
-    label: 'Quiz', 
-    path: '/quiz',
+    label: 'Internships', 
+    path: '/internships',
     children: [
-      { label: 'Registration', path: '/quiz/registration' },
-      { label: 'Result', path: '/quiz/result' }
+      { label: 'Apply Now', path: '/internships' },
+      { label: 'Verify Certificate', path: '/verification' }
     ]
   },
-  { label: 'Feedback', path: '/feedback' },
-  { label: 'Contact', path: '/contact' },
+  { 
+    label: 'Career Tools', 
+    path: '#',
+    children: [
+      { label: 'Check ATS Score', path: '/ats-score' },
+      { label: 'Job Email Builder', path: '/email-generator' },
+      { label: 'Resume Builder', path: '/resume-builder' },
+      { label: 'Interview Preparation', path: '/interview-prep' }
+    ]
+  },
+  { label: 'Tutorials', path: '/tutorials' },
+  { label: 'Practice', path: '/practice' },
+  { label: 'Compiler', path: '/code-playground' },
+  {
+    label: 'Quiz',
+    path: '#',
+    children: [
+        { label: 'Registration', path: '/quiz/registration' },
+        { label: 'Check Result', path: '/quiz/result' }
+    ]
+  },
+  { 
+    label: 'More', 
+    path: '#',
+    children: [
+        { label: 'Refer & Earn', path: '/refer' },
+        { label: 'Student Reviews', path: '/feedback' },
+        { label: 'Contact Support', path: '/contact' }
+    ]
+  },
 ];
 
 export const INTERNSHIPS: Internship[] = [
@@ -158,88 +183,46 @@ export const INTERNSHIPS: Internship[] = [
     img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=300&q=40",
     badge: "AI & Science",
     category: "ai",
-    students: "3.1K",
+    students: "2.1K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
 
-  // --- Business & Marketing ---
+  // --- Design & Creative ---
   {
-    id: 'bus-1',
-    name: "Digital Marketing",
-    img: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=300&q=40",
-    badge: "Business",
-    category: "business",
-    students: "9.8K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'bus-2',
-    name: "Business Strategy",
-    img: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=300&q=40",
-    badge: "Business",
-    category: "business",
-    students: "6.5K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'bus-3',
-    name: "Finance & Investment",
-    img: "https://images.unsplash.com/photo-1611974765270-ca12586343bb?auto=format&fit=crop&w=300&q=40",
-    badge: "Business",
-    category: "business",
-    students: "7.3K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'bus-4',
-    name: "Human Resources",
-    img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=300&q=40",
-    badge: "Business",
-    category: "business",
-    students: "4.9K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'bus-5',
-    name: "Stock Market Trading",
-    img: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=300&q=40",
-    badge: "Business",
-    category: "business",
-    students: "5.8K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'bus-6',
-    name: "Content Writing",
-    img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=300&q=40",
-    badge: "Creative",
-    category: "business",
-    students: "8.2K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-
-  // --- Design ---
-  {
-    id: 'des-1',
-    name: "UI/UX Design",
-    img: "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?auto=format&fit=crop&w=300&q=40",
+    id: 'design-1',
+    name: "Graphic Design",
+    img: "https://images.unsplash.com/photo-1626785774573-4b7993125651?auto=format&fit=crop&w=300&q=40",
     badge: "Design",
     category: "design",
-    students: "13.5K",
+    students: "19.5K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
   {
-    id: 'des-2',
-    name: "Graphics Design",
-    img: "https://images.unsplash.com/photo-1626785774573-4b799314346d?auto=format&fit=crop&w=300&q=40",
+    id: 'design-2',
+    name: "UI/UX Design",
+    img: "https://images.unsplash.com/photo-1586717791821-3f44a5638d0f?auto=format&fit=crop&w=300&q=40",
+    badge: "Design",
+    category: "design",
+    students: "15.8K",
+    duration: "4 Weeks",
+    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
+  },
+  {
+    id: 'design-3',
+    name: "Video Editing",
+    img: "https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=300&q=40",
+    badge: "Design",
+    category: "design",
+    students: "8.7K",
+    duration: "4 Weeks",
+    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
+  },
+  {
+    id: 'design-4',
+    name: "WordPress Development",
+    img: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=300&q=40",
     badge: "Design",
     category: "design",
     students: "9.1K",
@@ -247,168 +230,162 @@ export const INTERNSHIPS: Internship[] = [
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
 
-  // --- Engineering ---
+  // --- Business & Management ---
+  {
+    id: 'bus-1',
+    name: "Digital Marketing",
+    img: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=300&q=40",
+    badge: "Business",
+    category: "business",
+    students: "16.3K",
+    duration: "4 Weeks",
+    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
+  },
+  {
+    id: 'bus-2',
+    name: "Content Writing",
+    img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=300&q=40",
+    badge: "Business",
+    category: "business",
+    students: "11.2K",
+    duration: "4 Weeks",
+    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
+  },
+  {
+    id: 'bus-3',
+    name: "Social Media Marketing",
+    img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=300&q=40",
+    badge: "Business",
+    category: "business",
+    students: "13.5K",
+    duration: "4 Weeks",
+    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
+  },
+  {
+    id: 'bus-4',
+    name: "Human Resource (HR)",
+    img: "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=300&q=40",
+    badge: "Business",
+    category: "business",
+    students: "7.8K",
+    duration: "4 Weeks",
+    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
+  },
+
+  // --- Engineering & Core ---
   {
     id: 'eng-1',
-    name: "Robotics & Automation",
-    img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=300&q=40",
+    name: "Cyber Security",
+    img: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=300&q=40",
     badge: "Engineering",
     category: "engineering",
-    students: "4.2K",
+    students: "19.2K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
   {
     id: 'eng-2',
-    name: "AutoCAD",
-    img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=300&q=40",
+    name: "Cloud Computing",
+    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=300&q=40",
     badge: "Engineering",
     category: "engineering",
-    students: "5.6K",
+    students: "14.5K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
   {
     id: 'eng-3',
-    name: "Civil Engineering",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=300&q=40",
+    name: "IoT & Robotics",
+    img: "https://images.unsplash.com/photo-1535378437323-95558a725c13?auto=format&fit=crop&w=300&q=40",
     badge: "Engineering",
     category: "engineering",
-    students: "3.9K",
+    students: "6.4K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
   {
     id: 'eng-4',
-    name: "Biotechnology",
-    img: "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=300&q=40",
-    badge: "Science",
+    name: "AutoCAD",
+    img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=300&q=40",
+    badge: "Engineering",
     category: "engineering",
-    students: "2.8K",
+    students: "5.9K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
   {
     id: 'eng-5',
-    name: "Mechanical Design",
-    img: "https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?auto=format&fit=crop&w=300&q=40",
+    name: "VLSI Design",
+    img: "https://images.unsplash.com/photo-1555664424-778a6902201b?auto=format&fit=crop&w=300&q=40",
     badge: "Engineering",
     category: "engineering",
-    students: "4.5K",
+    students: "3.2K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   },
   {
     id: 'eng-6',
-    name: "Pharma Research",
-    img: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=300&q=40",
-    badge: "Science",
-    category: "engineering",
-    students: "2.2K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-
-  // --- Miscellaneous & Emerging Tech ---
-  {
-    id: 'misc-1',
-    name: "Cyber Security",
-    img: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=300&q=40",
-    badge: "Security",
-    category: "misc",
-    students: "8.9K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'misc-2',
-    name: "Cloud Computing",
-    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=300&q=40",
-    badge: "Technology",
-    category: "misc",
-    students: "7.8K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'misc-3',
-    name: "Power BI",
-    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=40",
-    badge: "Data",
-    category: "misc",
-    students: "6.2K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'misc-4',
-    name: "Blockchain",
-    img: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=300&q=40",
-    badge: "Crypto",
-    category: "misc",
-    students: "4.1K",
-    duration: "4 Weeks",
-    link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
-  },
-  {
-    id: 'misc-5',
-    name: "Internet of Things",
+    name: "MATLAB",
     img: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=40",
-    badge: "IoT",
-    category: "misc",
-    students: "5.5K",
+    badge: "Engineering",
+    category: "engineering",
+    students: "4.5K",
     duration: "4 Weeks",
     link: "https://forms.gle/s9TW7Tqi3tAQLCu78"
   }
 ];
 
-// Set of valid verification codes for the demo
 export const VALID_CODES = new Set([
-  // ... (Previous Codes - truncated for brevity in display but kept in code) ...
-  "CA/SE1/23569", "CA/SE1/18411", "CA/SE1/20779", "CA/SE1/19391", "CA/SE1/18717", "CA/SE1/18681" 
-  // Assume full list is here
+    'CA/2023/1001', 'CA/2023/1002', 'CA/2023/1003', 
+    'CA/SE1/23569', 'CA/WB2/98765', 'CA/AD3/11223'
 ]);
 
-// Mock Quiz Results for testing
-export const MOCK_QUIZ_RESULTS = {
-  "QZ-2024-001": { name: "Rahul Sharma", score: 92, rank: 5, domain: "Web Development" },
-  "QZ-2024-002": { name: "Priya Singh", score: 88, rank: 12, domain: "Python Programming" },
-  "QZ-2024-003": { name: "Amit Patel", score: 75, rank: 45, domain: "Data Science" },
-  "QZ-2024-004": { name: "Sneha Gupta", score: 98, rank: 1, domain: "Cyber Security" },
-};
-
-// Mock Leaderboard for top performers
-export const MOCK_LEADERBOARD = [
-  { rank: 1, name: "Sneha Gupta", score: 98 },
-  { rank: 2, name: "Arjun Reddy", score: 96 },
-  { rank: 3, name: "Priya Sharma", score: 95 },
-  { rank: 4, name: "Rohan Das", score: 94 },
-  { rank: 5, name: "Rahul Sharma", score: 92 },
-];
-
 export const TESTIMONIALS: FeedbackItem[] = [
-  {
-    id: 'fb-1',
-    name: 'Aarav Singh',
-    role: 'Web Dev Intern',
-    rating: 5,
-    content: 'The internship was incredibly structured. I learned more in 4 weeks than I did in a whole semester at college.',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80'
-  },
-  {
-    id: 'fb-2',
-    name: 'Meera Iyer',
-    role: 'Data Science Intern',
-    rating: 5,
-    content: 'Real-world projects were the highlight. The mentors were supportive and the community is amazing.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80'
-  },
-  {
-    id: 'fb-3',
-    name: 'Rohan Das',
-    role: 'App Dev Intern',
-    rating: 4,
-    content: 'Great experience overall. The tasks were challenging but rewarding. Would definitely recommend to juniors.',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80'
-  }
+    {
+      id: '1',
+      name: "Rahul Sharma",
+      role: "Web Development Intern",
+      rating: 5,
+      content: "The internship was well-structured and the tasks were challenging enough to help me learn new concepts. Highly recommended!",
+      avatar: "R"
+    },
+    {
+      id: '2',
+      name: "Priya Singh",
+      role: "App Development Intern",
+      rating: 5,
+      content: "I built my first Android app during this internship. The mentorship and community support were amazing.",
+      avatar: "P"
+    },
+    {
+      id: '3',
+      name: "Amit Patel",
+      role: "Data Science Intern",
+      rating: 4,
+      content: "Great exposure to real-world datasets. The tasks helped me build a strong portfolio.",
+      avatar: "A"
+    },
+    {
+      id: '4',
+      name: "Sneha Gupta",
+      role: "UI/UX Design Intern",
+      rating: 5,
+      content: "Loved the design challenges! It really pushed my creativity. The certificate is a great addition to my CV.",
+      avatar: "S"
+    },
+    {
+        id: '5',
+        name: "Vikram Malhotra",
+        role: "Cyber Security Intern",
+        rating: 5,
+        content: "The practical tasks on network security were very insightful. Best free internship for beginners.",
+        avatar: "V"
+    }
 ];
+
+export const MOCK_QUIZ_RESULTS = {
+  'QZ-2024-001': { name: 'Rahul S.', score: 95, rank: 12, domain: 'Web Development' },
+  'QZ-2024-002': { name: 'Anjali K.', score: 88, rank: 45, domain: 'Data Science' },
+  'QZ-2024-003': { name: 'Rohit M.', score: 92, rank: 23, domain: 'App Development' },
+  'QZ-2024-004': { name: 'Sneha P.', score: 75, rank: 156, domain: 'Python Programming' },
+};
